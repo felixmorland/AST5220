@@ -29,6 +29,7 @@ class BackgroundCosmology{
 
     // Splines to be made
     Spline eta_of_x_spline{"eta"};
+    Spline t_of_x_spline{"t"};
  
   public:
 
@@ -71,6 +72,7 @@ class BackgroundCosmology{
     double get_h() const;
     double get_Neff() const;
     double get_TCMB(double x = 0.0) const;
+    double get_t_of_x(double x = 0.0) const;
 
     // Distance measures
     double get_luminosity_distance_of_x(double x) const;

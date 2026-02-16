@@ -29,7 +29,8 @@ extern struct ConstantsAndUnits {
   const double Mpc         = 3.08567758e22 * m;           // Megaparsec
   const double eV          = 1.60217653e-19 * J;          // Electronvolt
   
-  // Physical constants    
+  // Physical constants   
+  const double Gyr         = 1e9*365.*24.*60.*60. * s;    // Gigayears
   const double k_b         = 1.38064852e-23 * J/K;        // Bolzmanns constant
   const double m_e         = 9.10938356e-31 * kg;         // Mass of electron
   const double m_H         = 1.6735575e-27 * kg;          // Mass of hydrogen atom

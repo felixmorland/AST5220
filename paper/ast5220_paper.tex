@@ -3,11 +3,19 @@
 \usepackage{graphicx}
 \usepackage{bookmark}
 \usepackage{txfonts}
+\usepackage{todonotes}
 % \usepackage[options]{hyperref}
+
+\renewcommand{\b}[1]{\mathbf{#1}}
+\renewcommand{\d}{\text{d}}
+\newcommand{\bivec}[1]{\overset{\leftrightarrow}{#1}}
+\newcommand{\dd}[2]{\frac{\d #1}{\d #2}}
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\ub}[2]{\underbrace{#1}_{#2}}
 
 \begin{document} 
 
-   \title{Make a suitable title: my paper on the cosmic microwave background and formation of structures in our Universe}
+   \title{Calculating the CMB power spectrum from simulated cosmic structure formation initiated by primordial fluctuations}
 
    \author{F. Morland\inst{1}}
 
@@ -27,59 +35,145 @@
    \maketitle
 
 \section{Introduction}
-Write an introduction here. Give context to the paper. Citations to relevant papers. You only need to do this in the end for the last milestone.
+Write an introduction here. Give context to the paper. Citations to relevant papers. You only need to do this in the end for the last milestone.  
 
-\section{Milestone I}
-Some introduction about what it is all about.
+\section{Milestone I: Background cosmology}
+To calculate the CMB power spectrum, we evolve primordial perturbations from the early Universe to the present day. Thus we must begin by constructing the background cosmology, into which we then can introduce perturbations. Our model Universe will have the possibility to contain two relativistic components (photons and neutrinos), two non-relativistic matter components (baryonic and CDM), a general (possibly non-zero) curvature density parameter $-1\le \Omega_{k0} \le 1$, and a cosmological constant. 
 
-\subsection{Theory}
-The theory behind this milestone.
+We first develop the theoretical framework describing the temporal evolution of density components in the Universe, along with derived quantities for model validation. We then employ an MCMC algorithm to constrain cosmological parameters using luminosity distance measurements from supernova observations.
 
-\subsection{Implementation details}
-Something about the numerical work.
-
-\subsection{Results}
-Show and discuss the results.
-
-\section{Milestone II}
-Some introduction about what it is all about.
-
-\subsection{Theory}
-The theory behind this milestone.
-
-\subsection{Implementation details}
-Something about the numerical work.
-
-\subsection{Results}
-Show and discuss the results.
-
-\section{Milestone III}
-Some introduction about what it is all about.
+\todo[inline, color=red]{
+      Equality times\\
+      Acceleration time\\
+      Age of the Universe; spline $t(x)$\\
+      Plot $d_L(z)/z$ vs. supernova data\\ 
+      Compare $\mathcal{H}'/\mathcal{H}$ and $\mathcal{H}''/\mathcal{H}$ to expectations\\
+      Posterior for $h$
+}
 
 \subsection{Theory}
-The theory behind this milestone.
+\todo[inline, color=red]{
+      Einstein field eqs.\\
+      FLRW metric and the Friedmann eqs.\\
+      Hubble function\\
+      Evolution of density parameters\\
+      Cosmic time\\
+      Conformal time\\
+      Luminosity distance
+}
+
+\begin{align*}
+      \dd{\mathcal{H}}{x} = \mathcal{H}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg] \;\Bigg|_{a = e^x}
+\end{align*}
+
+\begin{align*}
+      \dd{^2\mathcal{H}}{x^2} =&\; \mathcal{H}\Bigg\{\bigg[1-\frac{3}{2}\Omega_m -2\Omega_r  -\Omega_k\bigg]^2\\
+      & -\frac{1}{2}\Big(3\Omega_m + 4\Omega_r + 2\Omega_k \Big)^2+\frac{1}{2}\Big(9\Omega_m +16\Omega_r +4\Omega_k\Big)\Bigg\} \;\Bigg|_{a = e^x}
+\end{align*}
+
+\begin{align*}
+      x^{mr}_\text{eq} = \ln\bigg(\frac{\Omega_{r0}}{\Omega_{m0}}\bigg),\quad\quad x^{\Lambda m}_\text{eq} = \frac{1}{3}\ln\bigg(\frac{\Omega_{m0}}{\Omega_{\Lambda 0}}\bigg)
+\end{align*}
+
+
 
 \subsection{Implementation details}
-Something about the numerical work.
+\subsubsection{MCMC parameter fitting}
+\begin{equation*}
+      \chi^2(h,\Omega_{m0}, \Omega_{k0}) = \sum_{i=1}^N \frac{[d_L(z_i,h,\Omega_{m0},\Omega_{k0}) - d_L^{\rm obs}(z_i)]^2 }{\sigma_i^2}
+\end{equation*}
+
+Something about the numerical work 
+Minimum chi2 found: chi 29.2799, h 0.701711, OmegaM0 0.255027, OmegaK0 0.0789514
+t0 = 13.6781 Gyr
+
+
+
 
 \subsection{Results}
-Show and discuss the results.
+Show and discuss the results. 
 
-\section{Milestone IV}
-Some introduction about what it is all about.
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/dL_obs_vs_pred.pdf}
+      \caption{
+            Luminosity distance as a function of redshift $z$. The data points represent the luminosity distances deduced from observations of supernovae at different redshifts. The two curves show the luminosity distance functions $d_L(z)/z$ for the best fit parameters and for the fiducial cosmological parameters.
+      }
+      \label{fig:0}
+\end{figure}
 
-\subsection{Theory}
-The theory behind this milestone.
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/supernova_fitting.pdf}
+      \caption{
+            The regions of MCMC sampled points in the $(\Omega_{M0}, \Omega_{\Lambda0})$ parameter space within $1\sigma$ and $2\sigma$ of the pair associated with the minimal $\chi^2$. The diagonal dashed line shows the cosmologies giving a flat Universe; $\Omega_{K0}= 1-\Omega_{M0}-\Omega_{\Lambda0} = 0$.
+      }
+      \label{fig:1}
+\end{figure}
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/bestfit_OmegaLambda.pdf}
+      \caption{
+            k
+      }
+      \label{fig:2}
+\end{figure}
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/Hp_derivatives.pdf}
+      \caption{
+            yes
+      }
+      \label{fig:3}
+\end{figure}
+\begin{figure*}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/test_background_cosmology.pdf}
+      \caption{
+            uhm
+      }
+      \label{fig:4}
+\end{figure*}
 
-\subsection{Implementation details}
-Something about the numerical work.
+% \section{Milestone II}
+% Some introduction about what it is all about.
 
-\subsection{Results}
-Show and discuss the results.
+% \subsection{Theory}
+% The theory behind this milestone.
 
-\section{Conclusions}
+% \subsection{Implementation details}
+% Something about the numerical work.
 
-Write a short summary and conclusion in the end. 
+% \subsection{Results}
+% Show and discuss the results.
+
+% \section{Milestone III}
+% Some introduction about what it is all about.
+
+% \subsection{Theory}
+% The theory behind this milestone.
+
+% \subsection{Implementation details}
+% Something about the numerical work.
+
+% \subsection{Results}
+% Show and discuss the results.
+
+% \section{Milestone IV}
+% Some introduction about what it is all about.
+
+% \subsection{Theory}
+% The theory behind this milestone.
+
+% \subsection{Implementation details}
+% Something about the numerical work.
+
+% \subsection{Results}
+% Show and discuss the results.
+
+% \section{Conclusions}
+
+% Write a short summary and conclusion in the end. 
 
 \begin{acknowledgements}
       I thank my mom for financial support!
@@ -92,5 +186,46 @@ Write a short summary and conclusion in the end.
       ed.\ R. F. Stein,\& A. G. W. Cameron
       (Plenum, New York) 333
 \end{thebibliography}
+
+\begin{appendix}
+\section{Derivatives of the conformal Hubble function}
+
+The Hubble function is given by
+\begin{equation*}
+H = H_0 \sqrt{(\Omega_{b0}+\Omega_{\rm CDM 0})a^{-3} + (\Omega_{\gamma 0} + \Omega_{\nu 0}) a^{-4} + \Omega_{k 0} a^{-2} + \Omega_{\Lambda 0}},
+\end{equation*}
+where we can define $\Omega_{m0}\equiv \Omega_{b0}+\Omega_{\rm CDM 0}$ and $\Omega_{r0}\equiv \Omega_{\gamma 0} + \Omega_{\nu 0}$. The first derivative of the conformal Hubble function $\mathcal{H}\equiv aH(a)$ with respect to $x\equiv\ln a$ is
+\begin{align*}
+      \dd{\mathcal{H}}{x} &= \dd{a}{x}H + a \dd{H}{x} = \mathcal{H} + a^2 \dd{H}{a}.
+\end{align*}
+Let us compute the derivative of $H(a)$:
+\begin{align*}
+      \dd{H}{a} = -\frac{H_0^2}{2H}\Big(3\Omega_{m0}a^{-4} + 4\Omega_{r 0} a^{-5} + 2\Omega_{k 0} a^{-3}\Big).
+\end{align*}
+This gives 
+\begin{align*}
+      \dd{\mathcal{H}}{x} &= \mathcal{H} - a^2 \frac{H_0^2}{2H}\Big(3\Omega_{m0}a^{-4} + 4\Omega_{r 0} a^{-5} + 2\Omega_{k 0} a^{-3} \Big)\\
+      &= \mathcal{H}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg].
+\end{align*}
+Here the $\Omega_i$'s refer to the density parameters as functions of scale factor, i.e. $\Omega_i(a)$, which should be evaluated at $a=e^x.$\\
+
+The second derivative is a bit more cumbersome to calculate; from the product rule it follows that 
+\begin{align*}
+      \dd{^2\mathcal{H}}{x^2} =& \;\mathcal{H}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg]^2\\
+      &+ \mathcal{H}\dd{}{x}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg].
+\end{align*}
+Let $B$ be the expression inside the big bracket. We thus need $\d B/\d x$, which is most easily calculated by factoring out $H_0^2/H(a)^2$ from the last three terms of $B$;
+\begin{align*}
+      \dd{B}{x} =& -\frac{a}{2}\dd{}{a}\Bigg(\frac{H_0^2}{H^2}\Bigg)\Big(3\Omega_{m0}a^{-3} + 4\Omega_{r0}a^{-4} + 2\Omega_{k0}a^{-2} \Big)\\
+      &-\frac{a}{2}\frac{H_0^2}{H^2}\dd{}{a}\Big(3\Omega_{m0}a^{-3} + 4\Omega_{r0}a^{-4} + 2\Omega_{k0}a^{-2} \Big)\\[3mm]
+      =& -\frac{1}{2}\Big(3\Omega_m +4\Omega_r +2\Omega_k\Big)^2 + \frac{1}{2}\Big(9\Omega_m + 16 \Omega_r + 4 \Omega_k\Big).
+\end{align*}
+From this we end up with second derivative
+\begin{align*}
+      \dd{^2\mathcal{H}}{x^2} =&\; \mathcal{H}\Bigg\{\bigg[1-\frac{3}{2}\Omega_m -2\Omega_r  -\Omega_k\bigg]^2\\
+      & -\frac{1}{2}\Big(3\Omega_m + 4\Omega_r + 2\Omega_k \Big)^2+\frac{1}{2}\Big(9\Omega_m +16\Omega_r +4\Omega_k\Big)\Bigg\} \;\Bigg|_{a = e^x}.
+\end{align*}
+
+\end{appendix}
 
 \end{document}

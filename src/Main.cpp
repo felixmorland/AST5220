@@ -13,10 +13,13 @@ int main(int argc, char **argv){
   //=========================================================================
 
   // Background parameters
-  double h           = 0.67;
+  // double h           = 0.67;
+  double h           = 0.701711;
   double OmegaB      = 0.05;
-  double OmegaCDM    = 0.267;
-  double OmegaK      = 0.0;
+  // double OmegaCDM    = 0.267;
+  double OmegaCDM    = 0.205027;
+  // double OmegaK      = 0.0;
+  double OmegaK      = 0.0789514;
   double Neff        = 3.046;
   double TCMB        = 2.7255;
 
@@ -27,7 +30,7 @@ int main(int argc, char **argv){
   double A_s         = 2.1e-9;
   double n_s         = 0.965;
   double kpivot_mpc  = 0.05;
-
+  
   //=========================================================================
   // Module I
   //=========================================================================
@@ -38,11 +41,12 @@ int main(int argc, char **argv){
   cosmo.info();
   
   // Output background evolution quantities
+  // cosmo.output("fiducial_cosmology.txt");
   cosmo.output("cosmology.txt");
 
   // Do the supernova fits. Uncomment when you are ready to run this
   // Make sure you read the comments on the top of src/SupernovaFitting.h
-  // mcmc_fit_to_supernova_data("data/supernovadata.txt", "results_supernovafitting.txt");
+  //  mcmc_fit_to_supernova_data("data/supernovadata.txt", "results_supernovafitting.txt");
 
   // Remove when module is completed
   return 0;
