@@ -42,6 +42,22 @@ namespace Utils{
       std::chrono::time_point<std::chrono::steady_clock> & time_end){
     return std::chrono::duration_cast<std::chrono::duration<double>> (time_end - time_start).count();
   }
+  
+  /**
+  * @brief Utility function to display a progress bar in the terminal
+  */
+  void progressbar(double progress){
+      int barwidth = 50;
+      std::cout << "[";
+      int pos = barwidth * progress;
+      for (int i = 0; i < barwidth; ++i) {
+          if (i < pos) std::cout << "=";
+          else if (i == pos) std::cout << ">";
+          else std::cout << " ";
+      }
+      std::cout << "] " << int(progress * 100.0) << " %\r";
+      std::cout.flush();
+  }
 
   // Find a value in a spline
   double binary_search_for_value(

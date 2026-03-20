@@ -90,6 +90,7 @@ extern struct ConstantsAndUnits {
 
 namespace Utils {
   
+  void progressbar(double progress);
   // Find the x-value such that y(x) = y_value
   double binary_search_for_value(
       const Spline &y, 

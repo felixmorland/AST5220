@@ -17,13 +17,16 @@ class RecombinationHistory{
     
     // Helium fraction
     double Yp;
+
+    // Reionisation
+    bool reionisation;
  
     // The start and end points for recombination arrays (can be modified)
     const double x_start  = Constants.x_start;
     const double x_end    = Constants.x_end;
     
     // Numbers of points of Xe,ne array (modify as you see fit)
-    const int npts_rec_arrays = 4000;
+    const int npts_rec_arrays = 5e5;
   
     // Xe for when to switch between Saha and Peebles
     const double Xe_saha_limit = 0.99;
@@ -34,6 +37,7 @@ class RecombinationHistory{
  
     // Compute Xe from the Saha equation
     std::pair<double,double> electron_fraction_from_saha_equation(double x) const;
+    std::pair<double,double> electron_fraction_from_saha_equation_with_He(double x) const;
     
     // Right hand side of the dXedx Peebles equation
     int rhs_peebles_ode(double x, const double *y, double *dydx);
@@ -48,11 +52,17 @@ class RecombinationHistory{
     // The two things we need to solve: Xe/ne and tau
     void solve_for_optical_depth_tau();
 
+    // Sound horizon
+    void solve_for_sound_horizon();
+
     // Splines contained in this class
-    Spline Xe_of_x_spline{"Xe"};
+    Spline log_ne_of_x_spline{"ne"};
+    Spline log_Xe_of_x_spline{"Xe"};
     Spline Xe_saha_of_x_spline{"Xe_saha"};
-    Spline tau_of_x_spline{"tau"}; 
+    Spline tau_of_x_spline{"tau"};
+    Spline dtaudx_of_x_spline{"tau"}; 
     Spline g_tilde_of_x_spline{"g"};  
+    Spline sound_horizon_spline{"sound_horizon"};
 
   public:
 
@@ -60,7 +70,7 @@ class RecombinationHistory{
     RecombinationHistory() = delete;
     RecombinationHistory(
         BackgroundCosmology *cosmo, 
-        double Yp);
+        double Yp, bool reionisation);
 
     // Do all the solving
     void solve();
@@ -80,6 +90,7 @@ class RecombinationHistory{
     double ddgddx_tilde_of_x(double x) const;
     double Xe_of_x(double x) const;
     double ne_of_x(double x) const;
+    double get_sound_horizon(double x) const;
     double get_Yp() const;
 };
 

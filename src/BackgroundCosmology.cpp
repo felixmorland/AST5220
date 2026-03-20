@@ -156,18 +156,33 @@ double BackgroundCosmology::get_OmegaK(double x) const{
   // Curvature density parameter at x
   return OmegaK * H0*H0 / (pow(exp(x), 2) * pow(H_of_x(x), 2));
 }
-    
-double BackgroundCosmology::get_luminosity_distance_of_x(double x) const{
-  // d_L = r/a
-  return get_comoving_distance_of_x(x) * exp(-x);
+
+double BackgroundCosmology::get_OmegaM(double x) const {
+  // Total non-relativistic matter density parameter at x
+  return (OmegaB + OmegaCDM) * H0*H0 / (pow(exp(x), 3) * pow(H_of_x(x), 2));
 }
 
-double BackgroundCosmology::get_comoving_distance_of_x(double x) const{
-  // Conformal time
-  double chi = eta_of_x(0) - eta_of_x(x);
+double BackgroundCosmology::get_OmegaRtot(double x) const {
+  // Total relativistic species density parameter at x
+  return (OmegaR + OmegaNu) * H0*H0 / (pow(exp(x), 4) * pow(H_of_x(x), 2));
+}
 
-  // Account for possible curvature
+double BackgroundCosmology::get_OmegaMnu(double x) const {
+  // Matter + neutrinos density parameter at x
+  return get_OmegaM(x) + get_OmegaNu(x);
+}
+    
+double BackgroundCosmology::get_comoving_distance_of_x(double x) const{
+  // Comoving distance
+  return eta_of_x(0) - eta_of_x(x);
+}
+
+double BackgroundCosmology::get_r_coordinate(double x) const {
+  // Comoving distance
+  double chi = get_comoving_distance_of_x(x);
+  // r coordinate
   double r;
+
   if(OmegaK == 0) {
     r = chi;
   } else if(OmegaK > 0) {
@@ -175,8 +190,17 @@ double BackgroundCosmology::get_comoving_distance_of_x(double x) const{
   } else {
     r = chi * sin(sqrt(abs(OmegaK)) * H0 * chi / Constants.c) / (sqrt(abs(OmegaK)) * H0 * chi / Constants.c);
   };
-
   return r;
+}
+
+double BackgroundCosmology::get_luminosity_distance_of_x(double x) const{
+  // d_L = r/a
+  return get_r_coordinate(x) * exp(-x);
+}
+
+double BackgroundCosmology::get_angular_diameter_distance_of_x(double x) const{
+  // d_A = r*a
+  return get_r_coordinate(x) * exp(x);
 }
 
 double BackgroundCosmology::eta_of_x(double x) const{
@@ -208,18 +232,44 @@ double BackgroundCosmology::get_TCMB(double x) const{
 // Print out info about the class
 //====================================================
 void BackgroundCosmology::info() const{ 
+  // Event times
+  double x_MR_eq = log((OmegaR + OmegaNu)/(OmegaB + OmegaCDM));
+  double x_LM_eq = log((OmegaB + OmegaCDM)/OmegaLambda)/3.;
+  double x_acc = log((OmegaB + OmegaCDM)/(2.*OmegaLambda))/3.;
+
   std::cout << "\n";
   std::cout << "Info about cosmology class:\n";
-  std::cout << "OmegaB:      " << OmegaB                          << "\n";
-  std::cout << "OmegaCDM:    " << OmegaCDM                        << "\n";
-  std::cout << "OmegaLambda: " << OmegaLambda                     << "\n";
-  std::cout << "OmegaK:      " << OmegaK                          << "\n";
-  std::cout << "OmegaNu:     " << OmegaNu                         << "\n";
-  std::cout << "OmegaR:      " << OmegaR                          << "\n";
-  std::cout << "Neff:        " << Neff                            << "\n";
-  std::cout << "h:           " << h                               << "\n";
-  std::cout << "TCMB:        " << TCMB                            << "\n";
-  std::cout << "t0:          " << get_t_of_x(0) / Constants.Gyr   << "\n";
+  std::cout << "OmegaB:      " << OmegaB                                    << "\n";
+  std::cout << "OmegaCDM:    " << OmegaCDM                                  << "\n";
+  std::cout << "OmegaLambda: " << OmegaLambda                               << "\n";
+  std::cout << "OmegaK:      " << OmegaK                                    << "\n";
+  std::cout << "OmegaNu:     " << OmegaNu                                   << "\n";
+  std::cout << "OmegaR:      " << OmegaR                                    << "\n";
+  std::cout << "Neff:        " << Neff                                      << "\n";
+  std::cout << "h:           " << h                                         << "\n";
+  std::cout << "TCMB:        " << TCMB                                      << "\n";
+  std::cout << "t0:          " << get_t_of_x(0) / Constants.Gyr             << "\n";
+  std::cout << "eta0:        " << eta_of_x(0) / Constants.c / Constants.Gyr << "\n\n";
+
+  std::cout << "Matter-radiation equality"                                << "\n";
+  std::cout << "-------------------------"                                << "\n";
+  std::cout << "x_MR_eq:     " << x_MR_eq                                 << "\n";
+  std::cout << "t_MR_eq:     " << get_t_of_x(x_MR_eq) / Constants.Gyr     << "\n";
+  std::cout << "z_MR_eq:     " << exp(-x_MR_eq) - 1.                      << "\n\n";
+  
+  std::cout << "Onset of cosmic acceleration"                             << "\n";
+  std::cout << "----------------------------"                             << "\n";
+  std::cout << "x_acc:       " << x_acc                                   << "\n";
+  std::cout << "t_acc:       " << get_t_of_x(x_acc) / Constants.Gyr       << "\n";
+  std::cout << "z_acc:       " << exp(-x_acc) - 1.                        << "\n\n";
+
+  std::cout << "Matter-dark energy equality"                              << "\n";
+  std::cout << "---------------------------"                              << "\n";
+  std::cout << "x_LM_eq:     " << x_LM_eq                                 << "\n";
+  std::cout << "t_LM_eq:     " << get_t_of_x(x_LM_eq) / Constants.Gyr     << "\n";
+  std::cout << "z_LM_eq:     " << exp(-x_LM_eq) - 1.                      << "\n";
+
+
   std::cout << std::endl;
 } 
 
@@ -235,18 +285,20 @@ void BackgroundCosmology::output(const std::string filename) const{
 
   std::ofstream fp(filename.c_str());
   auto print_data = [&] (const double x) {
-    fp << x                                    << " ";
-    fp << eta_of_x(x)                          << " ";
-    fp << Hp_of_x(x)                           << " ";
-    fp << dHpdx_of_x(x)                        << " ";
-    fp << ddHpddx_of_x(x)                      << " ";
-    fp << get_OmegaB(x)                        << " ";
-    fp << get_OmegaCDM(x)                      << " ";
-    fp << get_OmegaLambda(x)                   << " ";
-    fp << get_OmegaR(x)                        << " ";
-    fp << get_OmegaNu(x)                       << " ";
-    fp << get_OmegaK(x)                        << " ";
-    fp << get_luminosity_distance_of_x(x)      << " ";
+    fp << x                                          << " ";
+    fp << eta_of_x(x)                                << " ";
+    fp << Hp_of_x(x)                                 << " ";
+    fp << dHpdx_of_x(x)                              << " ";
+    fp << ddHpddx_of_x(x)                            << " ";
+    fp << get_OmegaB(x)                              << " ";
+    fp << get_OmegaCDM(x)                            << " ";
+    fp << get_OmegaLambda(x)                         << " ";
+    fp << get_OmegaR(x)                              << " ";
+    fp << get_OmegaNu(x)                             << " ";
+    fp << get_OmegaK(x)                              << " ";
+    fp << get_luminosity_distance_of_x(x)            << " ";
+    fp << get_angular_diameter_distance_of_x(x)      << " ";
+    fp << get_t_of_x(x)                              << " ";
     fp <<"\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);

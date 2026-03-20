@@ -13,18 +13,24 @@ int main(int argc, char **argv){
   //=========================================================================
 
   // Background parameters
-  // double h           = 0.67;
-  double h           = 0.701711;
   double OmegaB      = 0.05;
-  // double OmegaCDM    = 0.267;
-  double OmegaCDM    = 0.205027;
-  // double OmegaK      = 0.0;
-  double OmegaK      = 0.0789514;
   double Neff        = 3.046;
   double TCMB        = 2.7255;
 
+  // Fiducial parameters
+  double h           = 0.67;
+  double OmegaCDM    = 0.267;
+  double OmegaK      = 0.0;
+
+  // Best-fit parameters
+  // double h           = 0.701711;
+  // double OmegaCDM    = 0.205027;
+  // double OmegaK      = 0.0789514;
+
   // Recombination parameters
   double Yp          = 0.245;
+  bool reionisation  = true;
+  // double Yp          = 0.0;
 
   // Power-spectrum parameters
   double A_s         = 2.1e-9;
@@ -42,21 +48,19 @@ int main(int argc, char **argv){
   
   // Output background evolution quantities
   // cosmo.output("fiducial_cosmology.txt");
-  cosmo.output("cosmology.txt");
+  // cosmo.output("best_fit_cosmology.txt");
 
   // Do the supernova fits. Uncomment when you are ready to run this
   // Make sure you read the comments on the top of src/SupernovaFitting.h
   //  mcmc_fit_to_supernova_data("data/supernovadata.txt", "results_supernovafitting.txt");
 
-  // Remove when module is completed
-  return 0;
 
   //=========================================================================
   // Module II
   //=========================================================================
   
   // Solve the recombination history
-  RecombinationHistory rec(&cosmo, Yp);
+  RecombinationHistory rec(&cosmo, Yp, reionisation);
   rec.solve();
   rec.info();
 

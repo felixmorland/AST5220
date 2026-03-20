@@ -1,9 +1,11 @@
-\documentclass{aa}  
-
+\documentclass[twocolumn]{aa}  
+\usepackage[]{natbib}
 \usepackage{graphicx}
 \usepackage{bookmark}
 \usepackage{txfonts}
 \usepackage{todonotes}
+\usepackage{enumitem}
+% \usepackage{caption}
 % \usepackage[options]{hyperref}
 
 \renewcommand{\b}[1]{\mathbf{#1}}
@@ -13,139 +15,402 @@
 \newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
 \newcommand{\ub}[2]{\underbrace{#1}_{#2}}
 
+% --- Center equations ---
+\makeatletter
+\@fleqnfalse
+\makeatother
+
 \begin{document} 
 
    \title{Calculating the CMB power spectrum from simulated cosmic structure formation initiated by primordial fluctuations}
 
-   \author{F. Morland\inst{1}}
+   \author{Felix Morland\inst{1}\thanks{The code developped for this project is available at \href{https://github.com/felixmorland/AST5220}{GitHub}.}}
 
    \institute{Institute of Theoretical Astrophysics,  
                 University of Oslo,  0315 Oslo,  Norway\\
-              \email{felix.morland@astro.uio.no}
+              \email{astro@felixmorland.no}
              }
 
    \date{}
 
-  \abstract{An abstract for the paper. Describe the paper. What is the paper about, what are the main results, etc.}
+  \abstract{I will write an abstract for the whole project at the end, once I have completed all the milestones.}
 
    \keywords{   cosmic microwave background  --
-                large-scale structure of Universe
+                large-scale structure of Universe --
+                linear perturbations
                }
+
+   \titlerunning{CMB Power Spectrum}
+   \authorrunning{F. Morland}
 
    \maketitle
 
-\section{Introduction}
-Write an introduction here. Give context to the paper. Citations to relevant papers. You only need to do this in the end for the last milestone.  
+\section*{0. Introduction}
+I will write an introduction for the whole project at the end, once I have completed all the milestones.
 
-\section{Milestone I: Background cosmology}
-To calculate the CMB power spectrum, we evolve primordial perturbations from the early Universe to the present day. Thus we must begin by constructing the background cosmology, into which we then can introduce perturbations. Our model Universe will have the possibility to contain two relativistic components (photons and neutrinos), two non-relativistic matter components (baryonic and CDM), a general (possibly non-zero) curvature density parameter $-1\le \Omega_{k0} \le 1$, and a cosmological constant. 
+\begin{figure}[h!]
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/cmb.png}
+      \caption{CMB \citep{cmb}}
+\end{figure}
 
-We first develop the theoretical framework describing the temporal evolution of density components in the Universe, along with derived quantities for model validation. We then employ an MCMC algorithm to constrain cosmological parameters using luminosity distance measurements from supernova observations.
 
-\todo[inline, color=red]{
-      Equality times\\
-      Acceleration time\\
-      Age of the Universe; spline $t(x)$\\
-      Plot $d_L(z)/z$ vs. supernova data\\ 
-      Compare $\mathcal{H}'/\mathcal{H}$ and $\mathcal{H}''/\mathcal{H}$ to expectations\\
-      Posterior for $h$
-}
+
+\section{Background cosmology}
+To compute the CMB power spectrum, we must first establish the background cosmological model upon which perturbations will evolve. This section details the construction of this background Universe. We begin by outlining the theoretical framework, most notably the Friedmann-Lemaître-Robertson-Walker (FLRW) metric and the resulting Friedmann equations that governs the expansion history and the evolution of its energy components. Subsequently, we describe the numerical implementation of this model, including the fiducial parameters adopted from Planck 2018. Finally, we validate our implementation by comparing its predicted timeline of cosmic epochs and derived quantities, such as the age of the universe, against theoretical expectations, and we present the results of an MCMC parameter fit to supernova data, which contextualizes the well-known Hubble tension within our model.
+
 
 \subsection{Theory}
-\todo[inline, color=red]{
-      Einstein field eqs.\\
-      FLRW metric and the Friedmann eqs.\\
-      Hubble function\\
-      Evolution of density parameters\\
-      Cosmic time\\
-      Conformal time\\
-      Luminosity distance
-}
+% \todo[inline, color=red]{
+%       Einstein field eqs.\\
+%       FLRW metric and the Friedmann eqs.\\
+%       Hubble function\\
+%       Evolution of density parameters\\
+%       Cosmic time\\
+%       Conformal time\\
+%       Luminosity distance
+% }
+In this section, we will present the relevant theory for developping the background cosmology in our model Universe along with all of the equations used. All of the theory is covered in greater detail in the lecture notes by Hans A. Winther for the cosmology course AST5220 \citep{winther_lectures, winther_milestone1}, so we will simply summarise the key details and derive some quantities that will come in handy for the numerical implementation.
 
-\begin{align*}
-      \dd{\mathcal{H}}{x} = \mathcal{H}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg] \;\Bigg|_{a = e^x}
-\end{align*}
+\subsubsection{The Friedmann-Lemaître-Robertson-Walker geometry}
 
-\begin{align*}
-      \dd{^2\mathcal{H}}{x^2} =&\; \mathcal{H}\Bigg\{\bigg[1-\frac{3}{2}\Omega_m -2\Omega_r  -\Omega_k\bigg]^2\\
-      & -\frac{1}{2}\Big(3\Omega_m + 4\Omega_r + 2\Omega_k \Big)^2+\frac{1}{2}\Big(9\Omega_m +16\Omega_r +4\Omega_k\Big)\Bigg\} \;\Bigg|_{a = e^x}
-\end{align*}
+For our background cosmology, we assume an isotropic and homogeneous Universe with a spatial scale factor $a(t)$ equipped with the Friedmann-Lemaître-Robertson-Walker (FLRW) metric
 
-\begin{align*}
-      x^{mr}_\text{eq} = \ln\bigg(\frac{\Omega_{r0}}{\Omega_{m0}}\bigg),\quad\quad x^{\Lambda m}_\text{eq} = \frac{1}{3}\ln\bigg(\frac{\Omega_{m0}}{\Omega_{\Lambda 0}}\bigg)
-\end{align*}
+\begin{align}
+      ds^2 = -dt^2 + a^2(t)\Big(dx^2+dy^2+dz^2\Big),\label{eq:FLRW metric}
+\end{align}
+or, on component form; $g_{00}=-1$, $g_{ij} = a^2(t)\delta_{ij}$.
 
-
-
-\subsection{Implementation details}
-\subsubsection{MCMC parameter fitting}
+At the background level, the constituents of our Universe, which include radiation (photons and massless neutrinos), non-relativistic matter (baryons and cold dark matter), and a cosmological constant, are treated as perfect fluids. For each component $i$, the stress-energy tensor in the comoving frame takes the diagonal form
 \begin{equation*}
-      \chi^2(h,\Omega_{m0}, \Omega_{k0}) = \sum_{i=1}^N \frac{[d_L(z_i,h,\Omega_{m0},\Omega_{k0}) - d_L^{\rm obs}(z_i)]^2 }{\sigma_i^2}
+T_{\mu\nu}^{(i)} = \mathrm{diag}(\rho_i, p_i, p_i, p_i),
+\end{equation*}
+with $\rho_i$ denoting the density and $p_i$ the pressure of that component.
+
+The resulting Einstein field equations for the FLRW metric and the sum of the stress-energy tensors for the perfect fluids,
+\begin{align*}
+      R_{\mu\nu}-\frac{1}{2}Rg_{\mu\nu} + \Lambda g_{\mu\nu} = 8\pi G\sum_i T^{(i)}_{\mu\nu},
+\end{align*}
+we get the Friedmann equations. The (00) component of the Einstein equations gives us the first equation,
+\begin{align}
+      H^2(a) \equiv \bigg(\frac{\dot{a}}{a}\bigg)^2 = \frac{8\pi G}{3}\sum_i \rho_i,\label{eq:Friedmann 1st}
+\end{align}
+while the (11), (22) and (33) components gives us the second Friedmann equation (assuming isotropy, or else they would yield three different equations),  
+\begin{align}
+      \frac{\ddot{a}}{a} = -\frac{4\pi G}{3}\sum_i (\rho_i + 3p_i). \label{eq:Friedmann 2nd}
+\end{align}
+As our time variable, we will use the logarithm of scale factor $x\equiv \ln [a(t)]$. We thus need to study the Friedmann equations, Eqs.(\ref{eq:Friedmann 1st})-(\ref{eq:Friedmann 2nd}), to understand how the scale factor evolves and how it is related to the evolution of the densities of the different components in our model Universe.
+
+\subsubsection{The Hubble function}
+Introducing the definition of the density parameters $\Omega_i \equiv 8\pi G \rho_i/3H^2$, and the equation of state $w_i \equiv p_i/\rho_i$, the first Friedmann equation can be recast into the form we will be using for our implementation of the background cosmology
+\begin{align*}
+      H^2 = H_0^2\sum_i \frac{\Omega_{i0}}{a^{3(1+w_i)}},
+\end{align*}
+where $H_0 = 100h\; \text{km/s/Mpc}$ is the Hubble constant, and $\Omega_{i0}$ is the current day value of the density parameter of component $i$.
+
+In our model Universe, we have dark energy, described by a cosmological constant ($\Lambda$) with equation of state $w_\Lambda=-1$, non-relativistic matter in the form of baryons ($b$) and cold dark matter (CDM) with equation of state $w_M = 0$, and two relativistic species, photons ($\gamma$) and neutrinos ($\nu$) with $w_R = 1/3$. The curvature (k) can be decribed as having an equation of state $w_k = -1/3$. We can thus explicitly write out our Hubble function as
+\begin{equation}
+      H(a) = H_0 \sqrt{\Omega_{\Lambda 0} + \frac{\Omega_{k 0}}{a^2} + \frac{\Omega_{b0} + \Omega_{\rm CDM 0}}{a^3} + \frac{\Omega_{\gamma 0} +\Omega_{\nu 0}}{a^4}}.\label{eq:Hubble a}
+\end{equation}
+
+The evolution of the density parameters as functions of the scale factor are thus given by
+\begin{align}
+\Omega_{k}(a) &= \frac{\Omega_{K0}}{a^2H(a)^2/H_0^2},\quad\quad\Omega_{M}(a) = \frac{\Omega_{M0}}{a^3H(a)^2/H_0^2},\nonumber \\
+\Omega_R(a) &= \frac{\Omega_{R 0}}{a^4H(a)^2/H_0^2}, \quad\quad\Omega_{\Lambda}(a) = \frac{\Omega_{\Lambda 0}}{H(a)^2/H_0^2}.\label{eq:density parameter evolutions}
+\end{align}
+Here we define the non-relativistic matter density parameter $\Omega_M = \Omega_b + \Omega_\text{CDM}$ and the relativistic species density parameter $\Omega_R = \Omega_\gamma + \Omega_\nu$.
+
+
+\subsubsection{Cosmic and conformal time}
+
+In the FLRW metric, Eq.(\ref{eq:FLRW metric}), we use the \textit{cosmic time} coordinate $t$ which is related to the scale factor through the Hubble function through the relation
+\begin{align*}
+      H \equiv \frac{1}{a}\dd{a}{t}\;\Rightarrow \; \dd{t}{x} =\frac{1}{H}, 
+\end{align*}
+or on integral form 
+\begin{align}
+      t(x) = \int_{-\infty}^x \frac{\d x'}{H(x')} .\label{eq:t(x)}
+\end{align}
+
+However, we also consider the \textit{conformal time} $\eta$ which is the distance that light may have travelled since the Big Bang (horizon). It is related to the cosmic time thorugh the relation
+\begin{equation*}
+      a\d \eta = c\d t \;\Rightarrow\; \dd{\eta}{x} = \frac{c}{aH}.
+\end{equation*}
+For calculating $\eta$, it is also prudent to introduce the conformal Hubble function $\mathcal{H}\equiv \frac{1}{a}\dd{a}{\eta}=aH $ such that the conformal time can be written on integral form as
+\begin{equation}
+      \eta(x) = \int_{-\infty}^{x}\frac{c\d x'}{\mathcal{H}(x')}.\label{eq:eta(x)}
+\end{equation}
+The derivatives of $\mathcal{H}$ with respect to $x$ are given by;
+\begin{align}
+      \dd{\mathcal{H}}{x} &= \mathcal{H}\bigg[1- \frac{3}{2}\Omega_{M} -2\Omega_{R} - \Omega_K\bigg] \;\Bigg|_{a = e^x}\;,\label{eq:dHpdx}\\[5mm]
+      \dd{^2\mathcal{H}}{x^2} &=\; \mathcal{H}\Bigg\{\bigg[1-\frac{3}{2}\Omega_M -2\Omega_R  -\Omega_K\bigg]^2\label{eq:ddHpddx}\\
+      & \quad-\frac{1}{2}\Big(3\Omega_M + 4\Omega_R + 2\Omega_K \Big)^2+\frac{1}{2}\Big(9\Omega_M +16\Omega_R +4\Omega_K\Big)\Bigg\} \;\Bigg|_{a = e^x}\;,\nonumber
+\end{align}
+where $\Omega_i$ are the density parameters evaluated at $a=e^x$.
+The derivatives of $\mathcal{H}$ are derived in Appendix \ref{appendix:derivatives of Hp}.
+
+
+\subsubsection{Luminosity distance and angular diameter distance}
+In order to compare our model with observations, and be able to perform parameter fitting, we will need to calculate two observables; namely the \textit{angular diameter distance} $d_A$, and the \textit{luminosity distance} $d_L$.
+
+Writing the line element in the FLRW metric, Eq.(\ref{eq:FLRW metric}), using spherical coordinates, we have 
+\begin{equation}
+      \d s^2 = -c^2\d t^2 + a^2\bigg(\frac{\d r^2}{1-kr^2} + r^2\d\theta^2 + r^2\sin\theta^2\d\phi^2\bigg),\label{eq:FLRW in polar coords}
+\end{equation}
+where $k$ is the curvature. Since we are observing photons (that move radially along the line of sight) when determining astrophysical distances, we consider the null geodesic, $\d s^2=0$, followed by the rays of light. For these photons, we get 
+\begin{equation}
+      c\d t = \frac{a\d r}{\sqrt{1-kr}}\;\Rightarrow\; \chi \equiv \eta_0-\eta = \int_0^r \frac{\d r'}{\sqrt{1-kr'}}.\label{eq:comoving distance}
+\end{equation}
+Here, $\chi$ denotes the \textit{comoving distance}. 
+
+Solving the integral in Eq.(\ref{eq:comoving distance}) and isolating $r$, we find three solutions, depending on the curvature 
+\begin{align*}
+r &= \begin{cases}
+\displaystyle \;  \frac{\chi\sin \Big[\varpi(\Omega_{K0})\Big]}{\varpi(\Omega_{K0})} & \Omega_{k 0} < 0,\\[2mm]
+\displaystyle \;\;\chi & \Omega_{k 0} =0, \\[2mm]
+\displaystyle \; \frac{\chi\sinh \Big[\varpi(\Omega_{K0})\Big] }{\varpi(\Omega_{K0})} & \Omega_{k 0} > 0,
+\end{cases}
+\end{align*}
+where $\varpi(\Omega_{K0})\equiv \sqrt{|\Omega_{k 0}}| H_0 \chi /c$.
+
+If an object has physical size $D$ and subtends an angle $\theta$ on the sky, the angular diameter distance is defined as $d_A = D/\theta$. Reading off the line element, Eq.(\ref{eq:FLRW in polar coords}), a displacement in the $\theta$-direction corresponds to a proper distance $dD = ar\,d\theta$, so
+\begin{align*}
+      d_A = D/\theta = ar.
+\end{align*}
+
+On the other hand, from the intrinsic luminosity of a source and its observed flux, the luminosity distance $d_L$ can be defined through $F = L/4\pi d_L^2$, which simply reads 
+\begin{equation*}
+      d_L = a/r = d_A/a^2.
 \end{equation*}
 
-Something about the numerical work 
-Minimum chi2 found: chi 29.2799, h 0.701711, OmegaM0 0.255027, OmegaK0 0.0789514
-t0 = 13.6781 Gyr
+\subsubsection{Some cosmological events}
 
+Finally, for our analysis of the simulated data, it is convenient to identify key cosmological events to serve as heuristic markers for our interpretation of the results. We will look at three relevant events at the time scale of the evolution of the background:
+\begin{enumerate}[label=(\roman*), leftmargin=12mm]
+      \item matter-radiation equality at $\displaystyle x^{MR}_\text{eq} = \ln\bigg(\frac{\Omega_{R0}}{\Omega_{M0}}\bigg)\;$;\\
+      \item the onset of cosmic acceleration (when $\ddot{a}=0$) at $$\hspace{-8mm} x_\text{acc} = \frac{1}{3}\ln\bigg(\frac{\Omega_{M0}}{2\Omega_{\Lambda 0}}\bigg)\;;$$
+      \item and the matter-dark energy equality at $$ \hspace{-8mm}x^{\Lambda M}_\text{eq} = \frac{1}{3}\ln\bigg(\frac{\Omega_{M0}}{\Omega_{\Lambda 0}}\bigg).$$
+\end{enumerate}
+For the derivations of the three $x$'s, see Appendix \ref{appendix:cosmological events}.
+
+\subsection{Implementation details}
+\subsubsection{Fiducial cosmological parameters}
+Our model Universe will assume $\Lambda$CDM fiducial cosmology and be initialised with the best-fit cosmological parameters from the Planck 2018 data \citep{planck2020}. We will thus take the dimensionless Hubble parameter $h=0.67$, the current day temperature of the CMB radiation $T_\text{CMB0} = 2.7255\text{ K}$, and the effective number of massless neutrino species $N_\text{eff}=3.046$.
+
+For the current day values of the density parameters, we set 
+\begin{align*}
+      \Omega_{b0} &= 0.05,\\
+      \Omega_\text{CDM0} &= 0.267,\\
+      \Omega_{K0} &= 0,\\
+      \Omega_{\gamma0} &=  \frac{\pi^2}{15} \frac{(k_bT_{\rm CMB 0})^4}{\hbar^3 c^5} \frac{8\pi G} {3H_0^2} \simeq 5.509\times 10^{-5},\\
+      \Omega_{\nu 0} &= \frac{7}{8}\left(\frac{4}{11}\right)^{4/3}\hspace{-3mm}N_{\rm eff}\Omega_{\gamma 0} \simeq 3.811 \times 10^{-5},\\[1mm]
+      \Omega_{\Lambda0}&= 1-\sum_{i\neq \Lambda} \Omega_{i0} \simeq 0.683.
+\end{align*}
+Here, the dark energy density parameter is defined such that $\sum_i \Omega_{i0} =1$, to ensure a spatially flat Universe. 
+
+\subsubsection{Numerical integration scheme}
+\label{subsub:numerical int scheme}
+
+To evaluate integral quantities such as Eqs.(\ref{eq:t(x)}) and (\ref{eq:eta(x)}), we recast them as ordinary differential equations and integrate numerically using the fourth-order Runge-Kutta solver provided by the GSL library \citep{gsl} and spline the result using the cubic spline algorithm available in GSL.
+
+The cosmic time ODE is
+\begin{align*}
+      \dd{t}{x} = \frac{1}{H(x)},
+\end{align*}
+which is to be integrated up from $x_{i}=-\infty$ to some final $x_f$. However, in practice, we must choose a very early time to integrate from. In our case, we solve in the interval $x_i = -20$ up to $x_f=5$. The initial condition for the ODE is determined deep inside the radiation dominated era, when $H(x)\sim H_0\sqrt{\Omega_{R0}}e^{-2x}$, such that
+\begin{align*}
+      \dd{t}{x} = \frac{e^{2x}}{H_0\sqrt{\Omega_{R0}}}\;\Rightarrow\;  t(x_i) = \int_{-\infty}^{x_i}  \frac{e^{2x}\d x}{H_0\sqrt{\Omega_{R0}}} = \frac{1}{2H(x_i)}.
+\end{align*}
+
+Similarly, we solve the ODE for the conformal time 
+\begin{align*}
+      \dd{\eta}{x} = \frac{c}{\mathcal{H}(x)}
+\end{align*}
+in the same interval, with the initial condition $\eta(x_i)=c/\mathcal{H}(x_i)$, due to the radiation dominated conformal Hubble function $\mathcal{H}(x) \sim H_0\sqrt{\Omega_{R0}}e^{-x}$.
+
+\subsubsection{MCMC parameter fitting}
+\label{mile1:imp:MCMC}
+Using Markov Chain Monte Carlo (MCMC), we will test our simulated Universe, based on fiducial cosmological parameters, against observations of type Ia supernova (SNIa) luminosity distances \citep{Betoule_2014}. The procedure searches for the triplet of ``best-fit'' parameters in the $(h,\Omega_{M0}, \Omega_{K0})$ parameter space that minimises
+
+\begin{equation*}
+      \chi^2(h,\Omega_{M0}, \Omega_{K0}) = \sum_{i=1}^N \frac{[d_L(z_i,h,\Omega_{M0},\Omega_{K0}) - d_L^{\rm obs}(z_i)]^2 }{\sigma_i^2}.
+\end{equation*}
+Here, $d_L$ are the predicted luminosity distances from our model at the observed redshifts $z_i$, while $d_L^\text{obs}$ are the observed distances, together with their associated errors.
 
 
 
 \subsection{Results}
-Show and discuss the results. 
 
+\subsubsection{Timeline of the background}
+
+\begin{table*}
+\centering
+\begin{minipage}{0.8\textwidth}
+      \centering
+      \renewcommand{\arraystretch}{1.3}
+      \begin{tabular}{l|c|c|c}
+            \hline\hline
+            \multicolumn{4}{c}{Equality times and onset of acceleration}\\
+            \hline
+            Event & Log scale factor $x$ & Redshift $z$& Time $t$ [Gyr]\\
+            \hline
+            Matter-radiation equality $(MR)$&-8.132&3400.33&$5.106\times 10^{-5}$\\
+            Onset of acceleration (acc)&-0.487&0.6272&7.752\\
+            Matter-dark energy equality $(\Lambda M)$&-0.256&0.2915&10.378\\
+            \hline\hline
+            \multicolumn{4}{c}{}
+      \end{tabular}
+      \caption{Times for when we have matter-radiation equality, onset of cosmic acceleration, and matter-dark energy equality expressed using $x$, redshift $z= e^{-x}-1$, and cosmic time $t(x)$.}
+      \label{tab:cosmic events}
+\end{minipage}
+\end{table*}
+In Table \ref{tab:cosmic events}, we have stated the times for the matter-radiation equality, the onset of cosmic expansion, and the matter-dark energy equality, in terms of the log scale factor $x$, the redshift $z(x) = e^{-x}-1$ and the cosmic time $t(x)$. We remark that cosmic acceleration only begins in the very late Universe at around $z\sim 0.6$. We thus observe the same late-stage acceleration as we would expect from the $\Lambda$CDM Universe.
 \begin{figure}
       \centering
-      \includegraphics[width=0.9\linewidth]{../figures/dL_obs_vs_pred.pdf}
+      \includegraphics[width=0.95\linewidth]{../figures/density_parameters.pdf}
       \caption{
-            Luminosity distance as a function of redshift $z$. The data points represent the luminosity distances deduced from observations of supernovae at different redshifts. The two curves show the luminosity distance functions $d_L(z)/z$ for the best fit parameters and for the fiducial cosmological parameters.
+            Evolution of the density parameters of relativistic species $(\Omega_R)$, non-relativistic matter $(\Omega_M)$, and of dark energy $(\Omega_\Lambda)$ as functions of $x=\ln a$ on the interval $-20\le x\le 5$. Plotted with vertical dashed and dotted lines are also the times of matter-radiation and matter-dark energy equality.
       }
-      \label{fig:0}
+      \label{fig:density parameters}
 \end{figure}
 
-\begin{figure}
-      \centering
-      \includegraphics[width=0.9\linewidth]{../figures/supernova_fitting.pdf}
-      \caption{
-            The regions of MCMC sampled points in the $(\Omega_{M0}, \Omega_{\Lambda0})$ parameter space within $1\sigma$ and $2\sigma$ of the pair associated with the minimal $\chi^2$. The diagonal dashed line shows the cosmologies giving a flat Universe; $\Omega_{K0}= 1-\Omega_{M0}-\Omega_{\Lambda0} = 0$.
-      }
-      \label{fig:1}
-\end{figure}
-\begin{figure}
-      \centering
-      \includegraphics[width=0.9\linewidth]{../figures/bestfit_OmegaLambda.pdf}
-      \caption{
-            k
-      }
-      \label{fig:2}
-\end{figure}
+Displayed in Figure \ref{fig:density parameters} are the density parameters $\Omega_R$, $\Omega_M$, and $\Omega_\Lambda$ as functions of $x$, representing the contributions from relativistic components, non-relativistic matter, and the cosmological constant. The figure highlights three distinct periods in the history of our model Universe:
+\begin{enumerate}[label=(\roman*), leftmargin=12mm, rightmargin=12mm]
+      \item an era of radiation domination in the very early Universe until $x_\text{eq}^{MR}=-8.132$;\\
+      \item a matter dominated period between $x_\text{eq}^{MR}=-8.132$ and $x_\text{eq}^{\Lambda M}=-0.256$;\\
+      \item and a late stage dark energy dominated Universe after $x_\text{eq}^{\Lambda M}=-0.256$.
+\end{enumerate} 
+This timeline is explained by the fact that $\rho_R\propto a^{-4}$, $\rho_M\propto a^{-3}$, while $\rho_\Lambda =\text{const}$, such that the density of the relativistic components decays faster than non-relativistic matter, which in turn decays faster than the density of dark energy.
+
 \begin{figure}
       \centering
       \includegraphics[width=0.9\linewidth]{../figures/Hp_derivatives.pdf}
       \caption{
-            yes
+            The conformal Hubble function $\mathcal{H}(x)$ along with $\mathcal{H}'/\mathcal{H}$ and $\mathcal{H}''/\mathcal{H}$ plotted as functions of $x$. The time at which we have the onset of cosmic acceleration $x_\text{acc}$, and the equality times $x^{mr}_\text{eq}$ and $x^{\Lambda m}_\text{eq}$ are shown with vertical dotted lines with the dominating component indicated above the regions in between them.
       }
-      \label{fig:3}
+      \label{fig:conformal Hubble}
 \end{figure}
-\begin{figure*}
+
+The transition between cosmological eras leaves clear signatures in the conformal Hubble function and its derivatives, as illustrated in Figure \ref{fig:conformal Hubble}. Equations (\ref{eq:dHpdx}) and (\ref{eq:ddHpddx}) predict specific values in each regime: $\mathcal{H}'/\mathcal{H} = -1$ and $\mathcal{H}''/\mathcal{H}=1$ in radiation domination, $\mathcal{H}'/\mathcal{H} = -1/2$ and $\mathcal{H}''/\mathcal{H}=1/4$ in matter domination, and both ratios approaching unity in a $\Lambda$-dominated universe. These predicted features are apparent in the bottom panel of Figure \ref{fig:conformal Hubble}.
+
+The top panel also exhibits the cosmic acceleration after $x_\text{acc}$. Since $\mathcal{H}\equiv aH=\dot{a}$, the conformal Hubble function describes the rate of change of the scale factor with respect to cosmic time. We observe that the slope of $\mathcal{H}$ changes from negative to positive, i.e. $\mathcal{H}'/\mathcal{H}$ becomes positive, at the minimum situated at $x=x_{acc}$. A positive slope means that 
+\begin{align*}
+      \mathcal{H}' = \dd{\dot{a}}{x} = \dd{t}{x} \ddot{a} >0.
+\end{align*}
+Since $t(x)$ is manifestly a strictly increasing function, $\d t/\d x$ is strictly positive at all times, such that the sign of $\mathcal{H}'$ depends on the sign of $\ddot{a}$. Therefore, we see that $\ddot{a}>0$ for $x>x_\text{acc}$, so we indeed have late-stage cosmic acceleration.
+
+\subsubsection{Cosmic and conformal time, and the age of the Universe}
+
+\begin{figure}
       \centering
-      \includegraphics[width=0.9\linewidth]{../figures/test_background_cosmology.pdf}
+      \includegraphics[width=0.9\linewidth]{../figures/conformal_time.pdf}
       \caption{
-            uhm
+            The top panel presents the evolution of the conformal time with respect to $x$. The bottom panel shows the dimensionless quantity $\eta\mathcal{H}/c$ over the same interval.
       }
-      \label{fig:4}
-\end{figure*}
+      \label{fig:eta(x)}
+\end{figure}
 
-% \section{Milestone II}
-% Some introduction about what it is all about.
+Figure \ref{fig:eta(x)} presents the conformal time $\eta(x)$ as well as the dimensionless quantity $\eta\mathcal{H}/c$ in the interval $-18\le x\le 0$. From the initial condition $\eta(x_i)=c/\mathcal{H}(x_i)$, derived in Section \ref{subsub:numerical int scheme}, we expect that $\eta\mathcal{H}/c\to 1$ as $x\to-\infty$. We observe that this is in fact the case for our model (see top panel, Fig.\ref{fig:eta(x)}). The conformal time is also a smooth monotonically increasing function of $x$, and its current day value is calculated to be $\eta(0)/c \simeq 46.319\; \text{Gyr}$.
 
-% \subsection{Theory}
-% The theory behind this milestone.
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/time_func_of_x.pdf}
+      \caption{
+            Cosmic time with respect to $x$. The gray diagonal line is included in order to compare the slope of $t(x)$ with our expectation of $\ln t \propto 3x/2$ during matter domination.
+      }
+      \label{fig:t(x)}
+\end{figure}
 
-% \subsection{Implementation details}
-% Something about the numerical work.
+The solution for the cosmic time $t(x)$ is showcased in Figure \ref{fig:t(x)} over the interval $-8\le x \le 5$, with a current day value determined to be $t_0 \equiv t(0) \simeq 13.858\;\text{Gyr}$. During the matter domination era, the Hubble function is $H(x)\propto e^{-3x/2}$, so we would expect that
+$$\dd{t}{x}\propto e^{3x/2}\;\Rightarrow\; \ln t(x)\propto \frac{3}{2}x. $$
+Comparing to the gray line included in Figure \ref{fig:t(x)}, we see that it matches the slope of $t(x)$ between $x=-8$ up to $x\sim x^{\Lambda M}_\text{eq}$. In the dark energy dominated era ($x\gtrsim x^{\Lambda M}_\text{eq}$), the slope decreases and the curve flattens out. This is to be expected from the fact that $H\sim H_0\sqrt{\Omega_{\Lambda0}}=\text{const}$ such that $t\propto x$ during this era.
 
-% \subsection{Results}
-% Show and discuss the results.
+
+\subsubsection{MCMC best-fit parameters and the Hubble tension}
+
+
+\begin{figure}
+      \centering
+      \includegraphics[width=0.95\linewidth]{../figures/supernova_fitting.pdf}
+      \caption{
+            The regions of sampled points in the $(\Omega_{M0}, \Omega_{\Lambda0})$ parameter space within $1\sigma$ and $2\sigma$ of the pair associated with the minimal $\chi^2$. The diagonal dashed line shows the cosmologies giving a flat Universe; $\Omega_{K0}= 1-\Omega_{M0}-\Omega_{\Lambda0} = 0$.
+      }
+      \label{fig:scatter M Lambda}
+\end{figure}
+
+\begin{figure}
+      \centering
+      \includegraphics[width=0.95\linewidth]{../figures/bestfit_OmegaLambda.pdf}
+      \caption{
+            Posteriors for $\Omega_{\Lambda0}$ and $h$ from the MCMC parameter fitting. In the posterior for $h$, we have also indicated the fiducial value of $h=0.67$ with a blue vertical line to highlight the Hubble tension.
+      }
+      \label{fig:posteriors OmegaL0 and h}
+\end{figure}
+
+\begin{figure}[h!]
+      \centering
+      \includegraphics[width=0.95\linewidth]{../figures/dL_obs_vs_pred.pdf}
+      \caption{
+            Luminosity distance as a function of redshift $z$. The data points represent the luminosity distances deduced from observations of supernovae at different redshifts. The two curves show the luminosity distance functions $d_L(z)/z$ for the best fit parameters and for the fiducial cosmological parameters.
+      }
+      \label{fig:luminosity distances}
+\end{figure}
+
+The MCMC parameter fitting to SNIa luminosity distance data (see Sect.\ref{mile1:imp:MCMC}) yielded the best-fit triplet of parameters
+\begin{align*}
+      h &= 0.701711,\\
+      \Omega_{M0} &= 0.255027,\\
+      \Omega_{K0} &= 0.0789514,
+\end{align*}
+with an associated $\chi^2=29.2799$. The observational data contains $N=31$ data, so we have $\chi^2/N\lesssim 1$, indicating a good fit.
+
+Figure \ref{fig:scatter M Lambda} shows the $(\Omega_{M0}, \Omega_{\Lambda0})$ parameter space sampled during the MCMC procedure, highlighting the regions within $1\sigma$ and $2\sigma$ of the best-fit parameters (minimum $\chi^2$). The fiducial Planck values lie within the $1\sigma$ contour, though slightly offset from the best-fit point.
+
+The marginalized posterior distributions for $\Omega_{\Lambda0}$ and the Hubble parameter $h$ are presented in Figure \ref{fig:posteriors OmegaL0 and h}, with vertical dotted lines indicating the fiducial Planck values. While the fiducial $\Omega_{\Lambda0}$ falls comfortably within the posterior and close to its best-fit value, the same is not true for $h$. The fiducial value of $h$ lies well outside the $1\sigma$ region of its posterior distribution, with a relative difference of
+$$\bigg|\frac{h_\text{best-fit}-h_\text{fiducial}}{h_\text{best-fit}}\bigg|\simeq 4.5\%.$$
+
+This discrepancy is further illustrated in Figure \ref{fig:luminosity distances}, which compares the luminosity distance-redshift relation predicted by our best-fit model to that of the fiducial Planck cosmology, alongside the observed SNIa data. The best-fit parameters clearly provide a superior match to the supernova measurements across the full redshift range, reinforcing that while the Planck cosmology remains our adopted baseline for subsequent calculations, it is less consistent with these late-universe distance indicators.
+
+Together, these results highlight the well-known \textit{Hubble tension}: the persistent disagreement between the value of $H_0$ inferred from early-universe observations (such as the CMB) and that derived from late-universe distance measurements (e.g., supernovae or galaxy surveys). Despite this tension, we will adopt the fiducial Planck $\Lambda$CDM cosmology for the remainder of this work, while noting its inconsistency with the SNIa luminosity distances used in our MCMC analysis.
+
+
+
+
+\section{Recombination history}
+Some introduction about what it is all about.
+
+\subsection{Theory}
+The theory behind this milestone.
+
+\subsection{Implementation details}
+Something about the numerical work.
+
+\subsection{Results}
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/optical_depth_derivatives.pdf}
+      \caption{yep}
+\end{figure}
+
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/free_electron_frac.pdf}
+      \caption{yep.}
+\end{figure}
+
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/visibility_functions.pdf}
+      \caption{No}
+\end{figure}
+
+\begin{figure}
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/soundhorizon.pdf}
+      \caption{No}
+\end{figure}
+
+Show and discuss the results.
 
 % \section{Milestone III}
 % Some introduction about what it is all about.
@@ -171,61 +436,84 @@ Show and discuss the results.
 % \subsection{Results}
 % Show and discuss the results.
 
-% \section{Conclusions}
+\section{Conclusions}
 
-% Write a short summary and conclusion in the end. 
+I will write a short summary and conclusion in the end.
 
 \begin{acknowledgements}
-      I thank my mom for financial support!
+      Thank you to Hans Winther for brilliant lectures and help with the project.
 \end{acknowledgements}
 
-\begin{thebibliography}{}
+\bibliographystyle{aa}
+\bibliography{references}
 
-  \bibitem[Baker(1966)]{baker} Baker, N. 1966,
-      in Stellar Evolution,
-      ed.\ R. F. Stein,\& A. G. W. Cameron
-      (Plenum, New York) 333
-\end{thebibliography}
 
 \begin{appendix}
 \section{Derivatives of the conformal Hubble function}
+\label{appendix:derivatives of Hp}
 
 The Hubble function is given by
 \begin{equation*}
 H = H_0 \sqrt{(\Omega_{b0}+\Omega_{\rm CDM 0})a^{-3} + (\Omega_{\gamma 0} + \Omega_{\nu 0}) a^{-4} + \Omega_{k 0} a^{-2} + \Omega_{\Lambda 0}},
 \end{equation*}
-where we can define $\Omega_{m0}\equiv \Omega_{b0}+\Omega_{\rm CDM 0}$ and $\Omega_{r0}\equiv \Omega_{\gamma 0} + \Omega_{\nu 0}$. The first derivative of the conformal Hubble function $\mathcal{H}\equiv aH(a)$ with respect to $x\equiv\ln a$ is
+where we can define $\Omega_{M0}\equiv \Omega_{b0}+\Omega_{\rm CDM 0}$ and $\Omega_{R0}\equiv \Omega_{\gamma 0} + \Omega_{\nu 0}$. The first derivative of the conformal Hubble function $\mathcal{H}\equiv aH(a)$ with respect to $x\equiv\ln a$ is
 \begin{align*}
       \dd{\mathcal{H}}{x} &= \dd{a}{x}H + a \dd{H}{x} = \mathcal{H} + a^2 \dd{H}{a}.
 \end{align*}
 Let us compute the derivative of $H(a)$:
 \begin{align*}
-      \dd{H}{a} = -\frac{H_0^2}{2H}\Big(3\Omega_{m0}a^{-4} + 4\Omega_{r 0} a^{-5} + 2\Omega_{k 0} a^{-3}\Big).
+      \dd{H}{a} = -\frac{H_0^2}{2H}\Big(3\Omega_{M0}a^{-4} + 4\Omega_{R 0} a^{-5} + 2\Omega_{k 0} a^{-3}\Big).
 \end{align*}
 This gives 
 \begin{align*}
-      \dd{\mathcal{H}}{x} &= \mathcal{H} - a^2 \frac{H_0^2}{2H}\Big(3\Omega_{m0}a^{-4} + 4\Omega_{r 0} a^{-5} + 2\Omega_{k 0} a^{-3} \Big)\\
-      &= \mathcal{H}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg].
+      \dd{\mathcal{H}}{x} &= \mathcal{H} - a^2 \frac{H_0^2}{2H}\Big(3\Omega_{M0}a^{-4} + 4\Omega_{R 0} a^{-5} + 2\Omega_{k 0} a^{-3} \Big)\\
+      &= \mathcal{H}\bigg[1- \frac{3}{2}\Omega_{M} -2\Omega_{R} - \Omega_K\bigg].
 \end{align*}
 Here the $\Omega_i$'s refer to the density parameters as functions of scale factor, i.e. $\Omega_i(a)$, which should be evaluated at $a=e^x.$\\
 
 The second derivative is a bit more cumbersome to calculate; from the product rule it follows that 
 \begin{align*}
-      \dd{^2\mathcal{H}}{x^2} =& \;\mathcal{H}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg]^2\\
-      &+ \mathcal{H}\dd{}{x}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_k\bigg].
+      \dd{^2\mathcal{H}}{x^2} =& \;\mathcal{H}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_K\bigg]^2\\
+      &+ \mathcal{H}\dd{}{x}\bigg[1- \frac{3}{2}\Omega_{m} -2\Omega_{r} - \Omega_K\bigg].
 \end{align*}
 Let $B$ be the expression inside the big bracket. We thus need $\d B/\d x$, which is most easily calculated by factoring out $H_0^2/H(a)^2$ from the last three terms of $B$;
 \begin{align*}
-      \dd{B}{x} =& -\frac{a}{2}\dd{}{a}\Bigg(\frac{H_0^2}{H^2}\Bigg)\Big(3\Omega_{m0}a^{-3} + 4\Omega_{r0}a^{-4} + 2\Omega_{k0}a^{-2} \Big)\\
-      &-\frac{a}{2}\frac{H_0^2}{H^2}\dd{}{a}\Big(3\Omega_{m0}a^{-3} + 4\Omega_{r0}a^{-4} + 2\Omega_{k0}a^{-2} \Big)\\[3mm]
-      =& -\frac{1}{2}\Big(3\Omega_m +4\Omega_r +2\Omega_k\Big)^2 + \frac{1}{2}\Big(9\Omega_m + 16 \Omega_r + 4 \Omega_k\Big).
+      \dd{B}{x} =& -\frac{a}{2}\dd{}{a}\Bigg(\frac{H_0^2}{H^2}\Bigg)\Big(3\Omega_{M0}a^{-3} + 4\Omega_{R0}a^{-4} + 2\Omega_{K0}a^{-2} \Big)\\
+      &-\frac{a}{2}\frac{H_0^2}{H^2}\dd{}{a}\Big(3\Omega_{M0}a^{-3} + 4\Omega_{R0}a^{-4} + 2\Omega_{K0}a^{-2} \Big)\\[3mm]
+      =& -\frac{1}{2}\Big(3\Omega_M +4\Omega_R +2\Omega_K\Big)^2 + \frac{1}{2}\Big(9\Omega_M + 16 \Omega_R + 4 \Omega_K\Big).
 \end{align*}
 From this we end up with second derivative
 \begin{align*}
-      \dd{^2\mathcal{H}}{x^2} =&\; \mathcal{H}\Bigg\{\bigg[1-\frac{3}{2}\Omega_m -2\Omega_r  -\Omega_k\bigg]^2\\
-      & -\frac{1}{2}\Big(3\Omega_m + 4\Omega_r + 2\Omega_k \Big)^2+\frac{1}{2}\Big(9\Omega_m +16\Omega_r +4\Omega_k\Big)\Bigg\} \;\Bigg|_{a = e^x}.
+      \dd{^2\mathcal{H}}{x^2} =&\; \mathcal{H}\Bigg\{\bigg[1-\frac{3}{2}\Omega_M -2\Omega_R  -\Omega_K\bigg]^2\\
+      & -\frac{1}{2}\Big(3\Omega_M + 4\Omega_R + 2\Omega_K \Big)^2+\frac{1}{2}\Big(9\Omega_M +16\Omega_R +4\Omega_K\Big)\Bigg\} \;\Bigg|_{a = e^x}.
 \end{align*}
 
+
+\section{Logarithmic scale factor at different cosmological events}
+\label{appendix:cosmological events}
+
+Matter-radiation equality happens when $\Omega_M(a^{MR}_\text{eq})=\Omega_R(a^{MR}_\text{eq})$. Using the expressions given in Eq.(\ref{eq:density parameter evolutions}), we find 
+\begin{equation*}
+      \frac{\Omega_{M0}}{(a^{MR}_\text{eq})^3} = \frac{\Omega_{R0}}{(a^{MR}_\text{eq})^4}\; \Rightarrow\; x^{MR}_\text{eq}\equiv \ln a^{MR}_\text{eq} = \ln\bigg(\frac{\Omega_{R0}}{\Omega_{M0}}\bigg)\;.
+\end{equation*}
+In a similar way, we derive that the matter-dark energy equality occurs for
+\begin{align*}
+      \frac{\Omega_{M0}}{(a^{\Lambda M}_\text{eq})^3} = \Omega_{\Lambda0}\; \Rightarrow\; x^{\Lambda M}_\text{eq}\equiv \ln a^{\Lambda M}_\text{eq} = \frac{1}{3}\ln\bigg(\frac{\Omega_{M0}}{\Omega_{\Lambda0}}\bigg)\;.
+\end{align*}
+
+The onset of cosmic acceleration is defined to be when $\ddot{a}=0$. From the second Friedmann equation, Eq.(\ref{eq:Friedmann 2nd}), we get that this occurs whenever
+\begin{align*}
+      \sum_i \rho_i(a_\text{acc})(1+3w_i) = 0.
+\end{align*}
+The relevant equations of state are $w_M = 0$, $w_R = 1/3$ and $w_\Lambda = -1$. We neglect the curvature parameter when working with fiducial cosmological parameter, and thus the condition for cosmic acceleration can be recast into 
+\begin{align*}
+      \Omega_M + 2\Omega_R -2\Omega_\Lambda =0\\
+      \Rightarrow\quad \frac{\Omega_{M0}}{(a_\text{acc})^3} + \frac{2\Omega_{R0}}{(a_\text{acc})^4}-2\Omega_{\Lambda0} = 0.
+\end{align*}
+At late times, the radiation density parameter can be neglected, so we end up with
+\begin{align*}
+      x_\text{acc} \equiv \ln a_\text{acc} = \frac{1}{3}\ln\bigg(\frac{\Omega_{M0}}{2\Omega_{\Lambda 0}}\bigg)\;.
+\end{align*}
 \end{appendix}
 
 \end{document}
