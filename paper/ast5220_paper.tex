@@ -49,11 +49,11 @@
 \section*{0. Introduction}
 I will write an introduction for the whole project at the end, once I have completed all the milestones.
 
-\begin{figure}[h!]
-      \centering
-      \includegraphics[width=0.9\linewidth]{../figures/cmb.png}
-      \caption{CMB \citep{cmb}}
-\end{figure}
+% \begin{figure}[h!]
+%       \centering
+%       \includegraphics[width=0.9\linewidth]{../figures/cmb.png}
+%       \caption{CMB \citep{cmb}}
+% \end{figure}
 
 
 
@@ -379,8 +379,9 @@ Together, these results highlight the well-known \textit{Hubble tension}: the pe
 
 
 \section{Recombination history}
-\todo[inline, color=red]{Some introduction about what it is all about.}
-\citep{winther_milestone2}
+
+Having established the background cosmology, we now turn to the recombination history of the Universe. While the background evolution governs the large-scale expansion, it is the microphysics of the photon-baryon plasma that determines when and how the CMB photons we observe today were released. Three epochs are of particular importance: \textit{recombination}, when free electrons and protons combine to form neutral hydrogen at $z \sim 1100$; \textit{decoupling}, when the photon mean free path exceeds the Hubble horizon and the CMB photons stream freely for the first time; and \textit{reionisation}, when the first generation of stars re-ionises the intergalactic medium at $z \sim 8$. Together, these epochs shape the optical depth of the Universe and leave distinct imprints on the CMB power spectrum. In this section we compute the free electron fraction $X_e$, the optical depth $\tau$, and the visibility function $\tilde{g}$, which together encode the full scattering history of CMB photons. The theory and methodology follow \citet{winther_lectures, winther_milestone2}.
+
 \subsection{Theory}
 At early times, the Universe was so hot that it was fully ionised, with photons and baryons tightly coupled through Thomson scattering in a photon-baryon plasma. As the Universe expanded and cooled, free electrons and protons combined to form neutral hydrogen in a process known as \textit{recombination}:
 $$e^- + p^+ \rightleftharpoons H + \gamma.$$
@@ -539,8 +540,89 @@ After splining the result, we plug in the value of $x$ at the time of decoupling
 
 \subsection{Results}
 \subsubsection{The free electron fraction and recombination}
+\begin{figure}
+      \centering
+      \includegraphics[width=0.99\linewidth]{../figures/free_electron_frac.pdf}
+      \caption{The free electron fraction $X_e$ as a function of $x = \ln a$ for three configurations: hydrogen and helium with reionisation (solid), hydrogen only without reionisation (dashed), and the pure Saha approximation with both species and without reionisation (dotted), with $Y_p = 0.245$ where applicable. The bottom panel magnifies the recombination epoch ($-7.5 \leq x \leq -6.5$, shaded grey in the top panel), highlighting the different recombination times.}
+      \label{fig:free electron fraction}
+\end{figure} 
+
+Figure \ref{fig:free electron fraction} displays the evolution of the free electron fraction $X_e$ as a function of $x$ in three different situations; the first is the fiducial model which takes into account both hydrogen and helium ionisation (with $Y_p=0.245$) and reionisation, the second is the simplest model, corresponding to a hydrogen only Universe with no reionisation, and the third is the pure Saha solution for a hydrogen and helium Universe ($Y_p=0.245$) with no reionisation.
+
+The top panel shows the overall evolution of $X_e$. At early times the plasma is fully ionised, with helium doubly ionised ($u=0,\;v=1,\;w=1$), giving
+\begin{equation*}
+      X_e = \frac{f_e}{1-Y_p} = \frac{1-Y_p/2}{1-Y_p} \simeq 1.162.
+\end{equation*}
+As the Universe cools and $k_BT_b \lesssim \chi_1$, helium transitions to being singly ionised ($u=1,\;v=0,\;w=1$), reducing $X_e \simeq 1.081$ at around $x \sim -8.7$. A further drop occurs when $k_BT_b \lesssim \chi_0$, at which point helium becomes fully neutral and only hydrogen remains ionised ($X_e = 1$). The final and most dramatic decrease corresponds to hydrogen recombination, after which $X_e$ freezes out at a relic plateau of $\sim 10^{-4}$. In the reionisation model, $X_e$ rises sharply back toward the initial $X_e \simeq 1.162$ at $x \sim -2.5$ as the first stars reionise the intergalactic medium.
+
+The hydrogen-only model without reionisation follows the same qualitative behaviour, but lacks both the early helium transitions and the late-time reionisation upturn.\\
+
+The bottom panel of Figure~\ref{fig:free electron fraction} magnifies the hydrogen recombination epoch ($-7.5 \leq x \leq -6.5$) on a logarithmic scale, allowing a clearer comparison between the Saha and Peebles solutions. The pure Saha approximation predicts a significantly faster decline in $X_e$, continuing to decrease toward machine zero as it assumes thermal equilibrium is maintained throughout. This leads to an earlier predicted time of recombination (defined as when $X_e = 0.1$) with $x_\mathrm{rec} = -7.14$ compared to $x_\mathrm{rec} = -6.97$ from the Peebles solution. The two predictions are compared in terms of $x$, redshift $z$, and cosmic time $t$ in Table~\ref{tab:recombination history}.
+
+The final freeze-out abundance of free electrons today was calculated to be $X_e(0) = 2.674\times 10^{-4}$ in the fiducial model ($Y_p=0.245$) without reionisation.
+
+\begin{table*}
+\centering
+\begin{minipage}{0.8\textwidth}
+      \centering
+      \renewcommand{\arraystretch}{1.3}
+      \begin{tabular}{l|r|c|c|c}
+            \hline\hline
+            \multicolumn{5}{c}{Decoupling and recombination times ($Y_p=0.245$)}\\
+            \hline
+            \multicolumn{2}{c|}{Event} & Log scale factor $x$ & Redshift $z$& Time $t$ [Myr]\\
+            \hline
+            \multirow{2}{*}{Decoupling}   & Peebles & -6.9728 & 1066.23 & $38.608$\\
+                                          & Saha\footnote{Undefined due to numerical difficulties.} & \texttt{undefined} & \texttt{undefined} & \texttt{undefined}\\
+            \hline
+            \multirow{2}{*}{Recombination}& Peebles & -6.9701 & 1063.36 & $38.784$\\
+                                          & Saha & -7.1404 & 1260.87 & $29.089$\\
+            \hline\hline
+            \multicolumn{5}{c}{}
+      \end{tabular}
+      \caption{The times for decoupling and recombination for the pure Saha solution and the Peebles solution expressed in terms of $x$, redshift $z$, and cosmic time $t$.}
+      \label{tab:recombination history}
+\end{minipage}
+\end{table*}
+
 \subsubsection{The optical depth and visibility function}
+
+\begin{figure*}
+      \centering
+      \begin{minipage}{0.9\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{../figures/optical_depth_derivatives.pdf}
+      \caption{Optical depth $\tau$ and its derivatives $\tau',\; \tau''$ as function of $x$ for four different configurations; either with or without helium, and with or without reionisation at late times.}\label{fig:optical depth}
+      \end{minipage}
+\end{figure*}
+
+Figure~\ref{fig:optical depth} shows the optical depth and its first two derivatives with respect to $x$ for four configurations: with and without helium ($Y_p = 0.245$ or $Y_p = 0$), and with and without reionisation. Panel~(a), the hydrogen-only case without reionisation, shows a smooth monotonically increasing $\tau$ going back in time, crossing $\tau = 1$ near the epoch of recombination, beyond which the Universe is optically thick ($\tau \gg 1$).
+
+Introducing reionisation, as in panels~(b) and~(d), imprints a secondary feature at $x \sim -2.5$ where the sudden rise in $X_e$ causes $\tau$ to plateau at $\tau \sim 0.1$ between the reionisation epoch and decoupling, reflecting the additional Thomson scattering experienced by CMB photons as they traverse the reionised intergalactic medium.
+
+Including helium, as in panels~(c) and~(d), leaves its most visible imprint on the second derivative $\tau''$, which develops additional small bumps at the epochs of helium recombination and reionisation. These correspond directly to the stepwise drops seen in $X_e$ in Figure~\ref{fig:free electron fraction}, where each transition in the helium ionisation state produces a brief change in the rate at which $\tau$ evolves.\\
+
+\begin{figure}[h!]
+      \centering
+      \includegraphics[width=0.95\linewidth]{../figures/visibility_functions.pdf}
+      \caption{Visibility function $\tilde{g}$ and its two first derivatives $\tilde{g}',\,\tilde{g}''$ as functions of $x$ for the Universe with both hydrogen and helium ($Y_p=0.245$) and late-stage reionisation.}
+      \label{fig:visibility func}
+\end{figure}
+
+Figure~\ref{fig:visibility func} shows the visibility function $\tilde{g}$ and its first two derivatives for the fiducial model with both hydrogen and helium. The visibility function is sharply peaked at $x_\mathrm{dec} = -6.973$, marking the epoch of decoupling, commonly referred to as the surface of last scattering, where the probability of a CMB photon undergoing its last Thomson scattering is maximised. The sharpness of this peak reflects the relatively brief duration of recombination: although recombination is not instantaneous, the transition from an opaque to a transparent Universe occurs over a narrow range of $x$, so the surface of last scattering is well-defined.
+
+The small bump visible at $x \sim -2.5$ corresponds to reionisation, where the rise in $X_e$ briefly increases the scattering rate and produces a small but non-zero probability of late-time scattering. Since $\tilde{g}$ represents the probability density that a photon was last scattered at a given $x$, it must satisfy the normalisation condition $\int_{-\infty}^{0} \tilde{g}(x)\,\mathrm{d}x = 1$, which our numerical implementation reproduces to machine precision, confirming the consistency of our solution. The derivatives $\tilde{g}'$ and $\tilde{g}''$ are smooth and well-behaved, and will be needed as source terms when computing CMB temperature and polarisation anisotropies. The decoupling times predicted by the Saha approximation and the Peebles equation are compared in Table~\ref{tab:recombination history}.
+
+
+
 \subsubsection{Sound horizon at decoupling}
+
+Evaluating the sound horizon at decoupling $r_s$ for the fiducial model, i.e. at $x_\mathrm{dec} = -6.9728$ (corresponding to redshift $z_\mathrm{dec} = 1066.23$), we find
+\begin{equation*}
+    r_s \equiv s(x_\mathrm{dec}) \simeq 147.093\;\mathrm{Mpc}.
+\end{equation*}
+This value is in good agreement with the standard result from \textit{Planck} \citep{planck2020}, and sets a fundamental physical scale in the Universe. At decoupling there is no longer any radiative pressure to counteract the gravitational collapse of the baryons, so the acoustic oscillations in the photon-baryon plasma are frozen in place, and the sound horizon marks the maximum distance over which these oscillations could have coherently developed. This scale is directly imprinted as the characteristic angular separation of the acoustic peaks in the CMB power spectrum, and as the baryon acoustic oscillation (BAO) scale in the matter power spectrum.
+
 % Yp:                          0.245
 % Reionisation:                false
 
@@ -558,9 +640,9 @@ After splining the result, we plug in the value of $x$ at the time of decoupling
 
 % Decoupling (SAHA)
 % ----------------------------------
-% x_dec_saha:           -1.09796e-06
-% z_dec_saha:           1.09796e-06
-% t_dec_saha:           13.8577
+% x_dec_saha:           -6
+% z_dec_saha:           402.429
+% t_dec_saha:           0.00189596
 
 % Recombination (SAHA)
 % -------------------------------
@@ -568,57 +650,14 @@ After splining the result, we plug in the value of $x$ at the time of decoupling
 % z_rec_saha:           1260.87
 % t_rec_saha:           0.000290885
 
-% Sound horizon at decoupling:        146.501
-% Sound horizon at decoupling (SAHA): 1222.71
-
-\begin{figure}
-      \centering
-      \includegraphics[width=0.99\linewidth]{../figures/free_electron_frac.pdf}
-      \caption{The free electron fraction $X_e$ as a function of $x = \ln a$ for three configurations: hydrogen and helium with reionisation (solid), hydrogen only without reionisation (dashed), and the pure Saha approximation with both species and without reionisation (dotted), with $Y_p = 0.245$ where applicable. The bottom panel magnifies the recombination epoch ($-7.5 \leq x \leq -6.5$, shaded grey in the top panel), highlighting the different recombination times.}
-\end{figure}
-
-\begin{figure*}
-      \centering
-      \begin{minipage}{0.9\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{../figures/optical_depth_derivatives.pdf}
-      \caption{Optical depth $\tau$ and its derivatives $\tau',\; \tau''$ as function of $x$ for four different configurations; either with or without helium, and with or without reionisation at late times.}
-      \end{minipage}
-\end{figure*}
+% Sound horizon at decoupling: 146.501
+% Integral of g_tilde:         1
 
 
-\begin{figure}
-      \centering
-      \includegraphics[width=0.95\linewidth]{../figures/visibility_functions.pdf}
-      \caption{Visibility function $\tilde{g}$ and its two first derivatives $\tilde{g}',\,\tilde{g}''$ as functions of $x$ for the Universe with both hydrogen and helium ($Y_p=0.245$) and late-stage reionisation.}
-\end{figure}
 
 
-\begin{table*}
-\centering
-\begin{minipage}{0.8\textwidth}
-      \centering
-      \renewcommand{\arraystretch}{1.3}
-      \begin{tabular}{l|r|c|c|c}
-            \hline\hline
-            \multicolumn{5}{c}{Recombination and decoupling times ($Y_p=0.245$)}\\
-            \hline
-            \multicolumn{2}{c|}{Event} & Log scale factor $x$ & Redshift $z$& Time $t$ [Myr]\\
-            \hline
-            \multirow{2}{*}{Decoupling}   & Peebles & -6.9728 & 1066.23 & $38.608$\\
-                                          & Saha\footnote{Undefined due to numerical difficulties.} & \texttt{undefined} & \texttt{undefined} & \texttt{undefined}\\
-            \hline
-            \multirow{2}{*}{Recombination}& Peebles & -6.9701 & 1063.36 & $38.784$\\
-                                          & Saha & -7.1404 & 1260.87 & $29.089$\\
-            \hline\hline
-            \multicolumn{5}{c}{}
-      \end{tabular}
-      \caption{l}
-      \label{tab:recombination history}
-\end{minipage}
-\end{table*}
 
-Show and discuss the results.
+
 
 % \section{Milestone III}
 % Some introduction about what it is all about.
@@ -649,7 +688,7 @@ Show and discuss the results.
 I will write a short summary and conclusion in the end.
 
 \begin{acknowledgements}
-      Thank you to Hans Winther for brilliant lectures and help with the project.
+      Thank you to Hans A. Winther for brilliant lectures and help with the project.
 \end{acknowledgements}
 
 \bibliographystyle{aa}

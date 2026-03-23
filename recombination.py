@@ -34,6 +34,8 @@ axs[0,0].text(0.6, 0.95, r'H no reionisation', transform=axs[0,0].transAxes,
             verticalalignment='top', fontsize=13)
 axs[0,0].text(0.81, 0.87, r'$Y_p=0$', transform=axs[0,0].transAxes, 
             verticalalignment='top', fontsize=13)
+axs[0,0].text(0.06, 0.15, r'$\mathbf{(a)}$', transform=axs[0,0].transAxes, 
+            verticalalignment='top', fontsize=16)
 
 axs[0,1].plot(lna_H_reion, tau_H_reion, color='black', linestyle='-')
 axs[0,1].plot(lna_H_reion, -dtaudx_H_reion, color=cblue, linestyle='-')
@@ -42,6 +44,8 @@ axs[0,1].text(0.56, 0.95, r'H with reionisation', transform=axs[0,1].transAxes,
             verticalalignment='top', fontsize=13)
 axs[0,1].text(0.81, 0.87, r'$Y_p=0$', transform=axs[0,1].transAxes, 
             verticalalignment='top', fontsize=13)
+axs[0,1].text(0.06, 0.15, r'$\mathbf{(b)}$', transform=axs[0,1].transAxes, 
+            verticalalignment='top', fontsize=16)
 
 axs[1,0].plot(lna_He_noreion, tau_He_noreion, color='black', linestyle='-')
 axs[1,0].plot(lna_He_noreion, -dtaudx_He_noreion, color=cblue, linestyle='-')
@@ -50,6 +54,8 @@ axs[1,0].text(0.5, 0.95, r'H + He no reionisation', transform=axs[1,0].transAxes
             verticalalignment='top', fontsize=13)
 axs[1,0].text(0.75, 0.87, r'$Y_p=0.245$', transform=axs[1,0].transAxes, 
             verticalalignment='top', fontsize=13)
+axs[1,0].text(0.06, 0.15, r'$\mathbf{(c)}$', transform=axs[1,0].transAxes, 
+            verticalalignment='top', fontsize=16)
 
 axs[1,1].plot(lna, tau, label=r'$\tau(x)$', color='black', linestyle='-')
 axs[1,1].plot(lna, -dtaudx, label=r"$-\tau'(x)$", color=cblue, linestyle='-')
@@ -58,6 +64,8 @@ axs[1,1].text(0.45, 0.95, r'H + He with reionisation', transform=axs[1,1].transA
             verticalalignment='top', fontsize=13)
 axs[1,1].text(0.75, 0.87, r'$Y_p=0.245$', transform=axs[1,1].transAxes, 
             verticalalignment='top', fontsize=13)
+axs[1,1].text(0.06, 0.15, r'$\mathbf{(d)}$', transform=axs[1,1].transAxes, 
+            verticalalignment='top', fontsize=16)
 
 for ax in axs.flat:
     ax.set_yscale('log')
@@ -78,7 +86,7 @@ plt.savefig('figures/optical_depth_derivatives.pdf')
 fig, axs = plt.subplots(2, 1, figsize=(6,6), gridspec_kw={'height_ratios': [2, 1], 'hspace': 0.0})
 axs[0].plot(lna, Xe, color='black', label=r'H + He with reionisation')
 axs[0].plot(lna, Xe_H_noreion, color='black', linestyle='dashed', label=r'H no reionisation')
-axs[0].plot(lna, Xe_saha, color='black', linestyle=':', label=r'H + He (Saha)')
+axs[0].plot(lna, Xe_saha, color='black', linestyle=':', label=r'Saha (H + He)')
 axs[0].axvspan(-7.5, -6.5, alpha=0.2, color='gray')
 # ax.set_yscale('log')
 
@@ -93,7 +101,7 @@ axs[0].legend(loc='upper right', fontsize=13)
 
 axs[1].plot(lna, Xe, color='black')
 axs[1].plot(lna, Xe_H_noreion, color='black', linestyle='dashed')
-axs[1].plot(lna, Xe_saha, color='black', linestyle=':')
+axs[1].plot(lna, Xe_saha_H_noreion, color='black', linestyle=':')
 axs[1].tick_params(axis='x', top=False)
 axs[1].axvline(-7.14035, color=cblue, label=r'Saha $x_\mathrm{rec}=-7.14$')
 axs[1].axvline(-6.97013, color=cred, label=r'Peebles $x_\mathrm{rec} = -6.97$')
@@ -124,7 +132,7 @@ for data, name, linestyle in plot_data:
     ax2.plot(lna, data, linestyle=linestyle, color='black')
 
 ax1.set_xlim(-7.4, -6.3)
-ax2.set_xlim(-2.75, -1)
+ax2.set_xlim(-2.75, -0.5)
 
 for ax in (ax1, ax2):
     ax.tick_params(direction='in')

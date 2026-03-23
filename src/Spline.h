@@ -124,7 +124,10 @@ class Spline{
     double eval_deriv(const double x, const int deriv) const;
     double deriv_x(const double x) const;
     double deriv_xx(const double x) const;
-  
+
+    // Integrate the spline between two x-points
+    double eval_integ(const double x1, const double x2) const;
+
     // Some useful info
     std::pair<double,double> get_xrange() const;
     std::string get_name() const;

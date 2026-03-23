@@ -191,6 +191,31 @@ double Spline::eval_deriv(const double x, const int deriv) const{
 }
 
 //====================================================
+// Evaluate integral
+//====================================================
+double Spline::eval_integ(const double x1, const double x2) const{
+  if(!spline) {
+    std::cout << "Error Spline::eval_integ Spline [" << name << "] has not been created!\n";
+    throw SPLINE_ERROR;
+  }
+
+  double xa = x1;
+  double xb = x2;
+  if(xa < xmin) xa = xmin;
+  if(xa > xmax) xa = xmax;
+  if(xb < xmin) xb = xmin;
+  if(xb > xmax) xb = xmax;
+
+#ifdef _USEOPENMP
+  gsl_interp_accel *xacc_thread = xaccs[omp_get_thread_num()];
+#else
+  gsl_interp_accel *xacc_thread = xacc;
+#endif
+
+  return gsl_spline_eval_integ(spline, xa, xb, xacc_thread);
+}
+
+//====================================================
 // Free up memory
 //====================================================
 void Spline::free(){
