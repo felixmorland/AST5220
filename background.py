@@ -77,7 +77,7 @@ plt.savefig('figures/supernova_fitting.pdf')
 
 # Histogram
 fig, axs = plt.subplots(2,1,figsize=(7,10))
-counts, bins, patches = axs[0].hist(OmegaLambda, bins=30, color='black', alpha=0.3, density=True)
+counts, bins, patches = axs[0].hist(OmegaLambda, bins=30, color='black', alpha=0.25, density=True)
 axs[0].set_xlabel(r'$\Omega_{\Lambda0}$')
 axs[0].set_ylabel(r'Probability density')
 axs[0].set_title(r'Posterior for $\Omega_{\Lambda0}$')
@@ -92,7 +92,7 @@ axs[0].axvline(OmegaLambda[min_index], linestyle='--', color='black', label=r'Be
 axs[0].axvline(OmegaL0, linestyle=':', color='black', label=r'Fiducial $\Omega_{\Lambda0}=0.683$')
 axs[0].legend(loc='upper right')
 
-counts, bins, patches = axs[1].hist(h, bins=30, color='black', alpha=0.3, density=True)
+counts, bins, patches = axs[1].hist(h, bins=30, color='black', alpha=0.25, density=True)
 axs[1].set_xlabel(r'$h$')
 axs[1].set_ylabel(r'Probability density')
 axs[1].set_title(r'Posterior for $h$')

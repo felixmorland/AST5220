@@ -29,7 +29,7 @@ int main(int argc, char **argv){
 
   // Recombination parameters
   double Yp          = 0.245;
-  bool reionisation  = true;
+  bool reionisation  = false;
   // double Yp          = 0.0;
 
   // Power-spectrum parameters
@@ -65,7 +65,7 @@ int main(int argc, char **argv){
   rec.info();
 
   // Output recombination quantities
-  rec.output("recombination.txt");
+  rec.output("recombination_He_noreion.txt");
   
   // Remove when module is completed
   return 0;

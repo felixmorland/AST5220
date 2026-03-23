@@ -24,7 +24,7 @@ void RecombinationHistory::solve(){
   // Compute and spline tau, dtaudx, ddtauddx, g, dgdx, ddgddx, ...
   solve_for_optical_depth_tau();
 
-  // Sound horizon
+  // Compute ODE for sound horizon
   solve_for_sound_horizon();
 }
 
@@ -41,6 +41,7 @@ void RecombinationHistory::solve_number_density_electrons(){
   Vector Xe_saha_arr_with_He(npts_rec_arrays);
   Vector Xe_peebles_arr(npts_rec_arrays);
   Vector ne_arr(npts_rec_arrays);
+  Vector ne_saha_arr(npts_rec_arrays);
 
   // Reionisation parameters
   double f_He       = Yp / (4.0 - 4.0*Yp);
@@ -56,12 +57,14 @@ void RecombinationHistory::solve_number_density_electrons(){
   const double OmegaB0      = cosmo->get_OmegaB();       
   const double rho_crit0    = 3.0 * H0*H0 / (8.0*M_PI*Constants.G);
 
+  std::cout << "Calculating Xe and ne...\n";
   int switch_idx = npts_rec_arrays;
   for(int i = 0; i < npts_rec_arrays; i++){
     Utils::progressbar(double(i) / double(npts_rec_arrays));
 
     auto Xe_ne_data_H = electron_fraction_from_saha_equation(x_array[i]);
     Xe_saha_arr[i] = Xe_ne_data_H.first;
+    ne_saha_arr[i] = Xe_ne_data_H.second;
 
     if (Yp != 0) {
       auto Xe_ne_data_He     = electron_fraction_from_saha_equation_with_He(x_array[i]);
@@ -128,15 +131,21 @@ void RecombinationHistory::solve_number_density_electrons(){
 
   Vector log_ne_arr(npts_rec_arrays);
   Vector log_Xe_arr(npts_rec_arrays);
+  Vector log_Xe_saha_arr(npts_rec_arrays);
+  Vector log_ne_saha_arr(npts_rec_arrays);
+
   for(int i = 0; i < npts_rec_arrays; i++){
     log_Xe_arr[i] = (Xe_arr[i] > 0) ? log(Xe_arr[i]) : -1e100;
     log_ne_arr[i] = (ne_arr[i] > 0) ? log(ne_arr[i]) : -1e100;
+    log_Xe_saha_arr[i] = (Xe_saha_arr[i] > 0) ? log(Xe_saha_arr[i]) : -1e100;
+    log_ne_saha_arr[i] = (ne_saha_arr[i] > 0) ? log(ne_saha_arr[i]) : -1e100;
   }
 
   log_ne_of_x_spline.create(x_array, log_ne_arr, "Spline log(ne(x))");
   log_Xe_of_x_spline.create(x_array, log_Xe_arr, "Spline log(Xe(x))");
-  Xe_saha_of_x_spline.create(x_array, Xe_saha_arr, "Spline Saha Xe(x)");
-
+  log_Xe_saha_of_x_spline.create(x_array, log_Xe_saha_arr, "Spline Saha log(Xe(x))");
+  log_ne_saha_of_x_spline.create(x_array, log_ne_saha_arr, "Spline log(ne(x))");
+  std::cout << "\n";
   Utils::EndTiming("Xe");
 }
 
@@ -316,7 +325,6 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   tau_ode.solve(dtaudx, x_array, tau_ic);
   auto tau_array = tau_ode.get_data_by_component(0);
 
-
   Vector g_tilde_array(npts_rec_arrays);
   Vector dtaudx_array(npts_rec_arrays);
   double H;
@@ -337,7 +345,7 @@ void RecombinationHistory::solve_for_sound_horizon(){
   Utils::StartTiming("soundhorizon");
 
   // The ODE system ds/dx, dtau_noreion/dx and dtau_baryon/dx
-  ODEFunction dsdx = [&](double x, const double *tau, double *dtaudx){
+  ODEFunction dsdx = [&](double x, const double *s, double *dsdx){
     double OmegaR     = cosmo -> get_OmegaR();
     double OmegaB     = cosmo -> get_OmegaB();
     double R          = 4*OmegaR / (3*OmegaB) * exp(-x);
@@ -345,7 +353,7 @@ void RecombinationHistory::solve_for_sound_horizon(){
     double cs         = Constants.c * sqrt(R / (3 + 3*R));
     double Hp         = cosmo -> Hp_of_x(x);
 
-    dtaudx[0]         = cs / Hp;   
+    dsdx[0]         = cs / Hp;   
 
     return GSL_SUCCESS;
   };
@@ -402,6 +410,10 @@ double RecombinationHistory::ne_of_x(double x) const{
   return exp(log_ne_of_x_spline(x));
 }
 
+double RecombinationHistory::ne_saha_of_x(double x) const{
+  return exp(log_ne_saha_of_x_spline(x));
+}
+
 double RecombinationHistory::get_sound_horizon(double x) const{
   return sound_horizon_spline(x);
 }
@@ -414,10 +426,39 @@ double RecombinationHistory::get_Yp() const{
 // Print some useful info about the class
 //====================================================
 void RecombinationHistory::info() const{
+  // Peebles
+  double x_rec = Utils::binary_search_for_value(log_Xe_of_x_spline, log(0.1));
+  double x_dec = Utils::binary_search_for_value(tau_of_x_spline, 1.0);
+  // Only Saha
+  double x_rec_saha = Utils::binary_search_for_value(log_Xe_saha_of_x_spline, log(0.1));
+  // double x_dec_saha = Utils::binary_search_for_value(tau_saha_of_x_spline, 1.0, {(-8.0),(-6.0)});
+
   std::cout << "\n";
   std::cout << "Info about recombination/reionization history class:\n";
-  std::cout << "Yp:             " << Yp                      << "\n";
-  std::cout << "Reionisation:   " << bool(reionisation)      << "\n";
+  std::cout << "Yp:                          " << Yp                                << "\n";
+  std::cout << "Reionisation:                " << std::boolalpha << reionisation    << "\n\n";
+
+  std::cout << "Decoupling\n----------------------------------------\n";
+  std::cout << "x_dec:                 " << x_dec                                        << "\n";
+  std::cout << "z_dec:                 " << exp(-x_dec) - 1.0                            << "\n";
+  std::cout << "t_dec:                 " << cosmo->get_t_of_x(x_dec) / Constants.Gyr     << "\n\n";
+
+  std::cout << "Recombination\n-------------------------------------\n";
+  std::cout << "x_rec:                " << x_rec                                         << "\n";
+  std::cout << "z_rec:                " << exp(-x_rec) - 1.0                             << "\n";
+  std::cout << "t_rec:                " << cosmo->get_t_of_x(x_rec) / Constants.Gyr      << "\n\n";
+
+  // std::cout << "Decoupling (SAHA)\n----------------------------------\n";
+  // std::cout << "x_dec_saha:           " << x_dec_saha                                    << "\n";
+  // std::cout << "z_dec_saha:           " << exp(-x_dec_saha) - 1.0                        << "\n";
+  // std::cout << "t_dec_saha:           " << cosmo->get_t_of_x(x_dec_saha) / Constants.Gyr << "\n\n";
+
+  std::cout << "Recombination (SAHA)\n-------------------------------\n";
+  std::cout << "x_rec_saha:           " << x_rec_saha                                    << "\n";
+  std::cout << "z_rec_saha:           " << exp(-x_rec_saha) - 1.0                        << "\n";
+  std::cout << "t_rec_saha:           " << cosmo->get_t_of_x(x_rec_saha) / Constants.Gyr << "\n\n";
+
+  std::cout << "Sound horizon at decoupling: " << get_sound_horizon(x_dec)/Constants.Mpc << "\n";
   std::cout << std::endl;
 } 
 
@@ -432,16 +473,17 @@ void RecombinationHistory::output(const std::string filename) const{
 
   Vector x_array = Utils::linspace(x_min, x_max, npts);
   auto print_data = [&] (const double x) {
-    fp << x                    << " ";
-    fp << Xe_of_x(x)           << " ";
-    fp << ne_of_x(x)           << " ";
-    fp << tau_of_x(x)          << " ";
-    fp << dtaudx_of_x(x)       << " ";
-    fp << ddtauddx_of_x(x)     << " ";
-    fp << g_tilde_of_x(x)      << " ";
-    fp << dgdx_tilde_of_x(x)   << " ";
-    fp << ddgddx_tilde_of_x(x) << " ";
-    fp << get_sound_horizon(x) << " ";
+    fp << x                               << " ";
+    fp << Xe_of_x(x)                      << " ";
+    fp << ne_of_x(x)                      << " ";
+    fp << tau_of_x(x)                     << " ";
+    fp << dtaudx_of_x(x)                  << " ";
+    fp << ddtauddx_of_x(x)                << " ";
+    fp << g_tilde_of_x(x)                 << " ";
+    fp << dgdx_tilde_of_x(x)              << " ";
+    fp << ddgddx_tilde_of_x(x)            << " ";
+    fp << get_sound_horizon(x)            << " ";
+    fp << exp(log_Xe_saha_of_x_spline(x)) << " ";
     fp << "\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);
