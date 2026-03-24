@@ -335,8 +335,26 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   };
 
   ODESolver tau_saha_ode;
-  tau_saha_ode.solve(dtau_saha_dx, x_array, tau_ic);
+  Vector x_array_saha = Utils::linspace(x_end, -4.0, npts_rec_arrays);
+  tau_saha_ode.solve(dtau_saha_dx, x_array_saha, tau_ic);
   auto tau_saha_array = tau_saha_ode.get_data_by_component(0);
+
+  Vector log_tau_saha_array(npts_rec_arrays);
+  for (int i = 0; i < npts_rec_arrays; i++){
+    if (tau_saha_array[i] != tau_saha_array[i]) {
+      std::cout << "NAN IN TAU_SAHA_ARRAY AT x = " << x_array[i] << "  " << x_array[i-1] << "\n";
+      break;
+    }
+    if (std::isinf(tau_saha_array[i])) {
+      std::cout << "INF IN TAU_SAHA_ARRAY AT x = " << x_array[i] << "  " << x_array[i-1] << "\n";
+      break;
+    }
+    if (ne_saha_of_x(x_array[i]) != ne_saha_of_x(x_array[i])) {
+      std::cout << "NAN IN NE_SAHA_ARRAY AT x = " << x_array[i] << "\n";
+      break;
+    }
+    log_tau_saha_array[i] = log(tau_saha_array[i]);
+  }
 
   Vector g_tilde_array(npts_rec_arrays);
   Vector dtaudx_array(npts_rec_arrays);
@@ -348,7 +366,7 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   }
 
   tau_of_x_spline.create(x_array, tau_array, "Spline optical depth tau(x)");
-  tau_saha_of_x_spline.create(x_array, tau_saha_array, "Spline Saha optical depth tau(x)");
+  log_tau_saha_of_x_spline.create(x_array, log_tau_saha_array, "Spline Saha optical depth tau(x)");
   dtaudx_of_x_spline.create(x_array, dtaudx_array, "Spline dtau/dx");
   g_tilde_of_x_spline.create(x_array, g_tilde_array, "Spline visibility function g_tilde(x)");
 
@@ -445,7 +463,7 @@ void RecombinationHistory::info() const{
   double x_dec = Utils::binary_search_for_value(tau_of_x_spline, 1.0);
   // Only Saha
   double x_rec_saha = Utils::binary_search_for_value(log_Xe_saha_of_x_spline, log(0.1));
-  double x_dec_saha = Utils::binary_search_for_value(tau_saha_of_x_spline, 1.0, {(-8.0),(-6.0)});
+  double x_dec_saha = Utils::binary_search_for_value(log_tau_saha_of_x_spline, 0.0);
 
   std::cout << "\n";
   std::cout << "Info about recombination/reionization history class:\n";
@@ -500,6 +518,7 @@ void RecombinationHistory::output(const std::string filename) const{
     fp << ddgddx_tilde_of_x(x)            << " ";
     fp << get_sound_horizon(x)            << " ";
     fp << exp(log_Xe_saha_of_x_spline(x)) << " ";
+    // fp << exp(log_tau_saha_of_x_spline(x)) << " ";
     fp << "\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);

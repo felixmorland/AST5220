@@ -100,7 +100,7 @@ namespace Utils{
           x_low = x_array[i];
           break;
         }
-        if(i == nsearch-1) throw "Error binary_search_for_value. Could not find a good interval to start search\n";
+        if(i == nsearch-1) throw std::runtime_error("Error binary_search_for_value. Could not find a good interval to start search");
       }
     }
 
@@ -120,7 +120,7 @@ namespace Utils{
       else
         x_low  = x_mid;
       count++;
-      if(count > nmax_iter) throw "Error binary_search_for_value. Value not found after nmax iterations\n";
+      if(count > nmax_iter) throw std::runtime_error("Error binary_search_for_value. Value not found after nmax iterations");
     }
 
     return x_low;
