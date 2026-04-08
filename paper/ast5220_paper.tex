@@ -11,6 +11,7 @@
 
 \renewcommand{\b}[1]{\mathbf{#1}}
 \renewcommand{\d}{\text{d}}
+\newcommand{\td}[1]{\todo[inline, color=red]{#1}}
 \newcommand{\bivec}[1]{\overset{\leftrightarrow}{#1}}
 \newcommand{\dd}[2]{\frac{\d #1}{\d #2}}
 \newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
@@ -572,11 +573,11 @@ The final freeze-out abundance of free electrons today was calculated to be $X_e
             \hline
             \multicolumn{2}{c|}{Event} & Log scale factor $x$ & Redshift $z$& Time $t$ [Myr]\\
             \hline
-            \multirow{2}{*}{Decoupling}   & Peebles & -6.9728 & 1066.23 & $38.608$\\
-                                          & Saha\footnote{Undefined due to numerical difficulties.} & \texttt{undefined} & \texttt{undefined} & \texttt{undefined}\\
+            \multirow{2}{*}{Decoupling}   & Peebles & -6.9728 & 1066.23 & 0.3861\\
+                                          & Saha & -7.1581 & 1283.46 & 0.2822\\
             \hline
-            \multirow{2}{*}{Recombination}& Peebles & -6.9701 & 1063.36 & $38.784$\\
-                                          & Saha & -7.1404 & 1260.87 & $29.089$\\
+            \multirow{2}{*}{Recombination}& Peebles & -6.9701 & 1063.36 & $0.3878$\\
+                                          & Saha & -7.1404 & 1260.87 & $0.2909$\\
             \hline\hline
             \multicolumn{5}{c}{}
       \end{tabular}
@@ -619,10 +620,10 @@ The small bump visible at $x \sim -2.5$ corresponds to reionisation, where the r
 
 Evaluating the sound horizon at decoupling $r_s$ for the fiducial model, i.e. at $x_\mathrm{dec} = -6.9728$ (corresponding to redshift $z_\mathrm{dec} = 1066.23$), we find
 \begin{equation*}
-    r_s \equiv s(x_\mathrm{dec}) \simeq 147.093\;\mathrm{Mpc}.
+    r_s \equiv s(x_\mathrm{dec}) \simeq 146.501\;\mathrm{Mpc}.
 \end{equation*}
 This value is in good agreement with the standard result from \textit{Planck} \citep{planck2020}, and sets a fundamental physical scale in the Universe. At decoupling there is no longer any radiative pressure to counteract the gravitational collapse of the baryons, so the acoustic oscillations in the photon-baryon plasma are frozen in place, and the sound horizon marks the maximum distance over which these oscillations could have coherently developed. This scale is directly imprinted as the characteristic angular separation of the acoustic peaks in the CMB power spectrum, and as the baryon acoustic oscillation (BAO) scale in the matter power spectrum.
-
+\td{Comment pure Saha decoupling/recombination and Peebles}
 % Yp:                          0.245
 % Reionisation:                false
 

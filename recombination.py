@@ -9,17 +9,17 @@ cred = "#DE4E61"
 cgreen = "#32A639"
 
 # Recombination data: H + He, reionisation
-lna, Xe, ne, tau, dtaudx, ddtauddx, g_tilde, dgdx, ddgddx, sound_hor, Xe_saha = np.loadtxt('recombination_He_reion.txt', unpack=True)
+lna, Xe, ne, tau, dtaudx, ddtauddx, g_tilde, dgdx, ddgddx, sound_hor, Xe_saha = np.loadtxt('recombination_data/recombination_He_reion.txt', unpack=True)
 decoupling = -6.97282
 
 # Recombination data: H + He, NO reionisation
-lna_He_noreion, Xe_He_noreion, ne_He_noreion, tau_He_noreion, dtaudx_He_noreion, ddtauddx_He_noreion, g_tilde_He_noreion, dgdx_He_noreion, ddgddx_He_noreion, sound_hor_He_noreion, Xe_saha_He_noreion = np.loadtxt('recombination_He_noreion.txt', unpack=True)
+lna_He_noreion, Xe_He_noreion, ne_He_noreion, tau_He_noreion, dtaudx_He_noreion, ddtauddx_He_noreion, g_tilde_He_noreion, dgdx_He_noreion, ddgddx_He_noreion, sound_hor_He_noreion, Xe_saha_He_noreion = np.loadtxt('recombination_data/recombination_He_noreion.txt', unpack=True)
 
 # Recombination data: H, NO reionisation
-lna_H_noreion, Xe_H_noreion, ne_H_noreion, tau_H_noreion, dtaudx_H_noreion, ddtauddx_H_noreion, g_tilde_H_noreion, dgdx_H_noreion, ddgddx_H_noreion, sound_hor_H_noreion, Xe_saha_H_noreion = np.loadtxt('recombination_H_noreion.txt', unpack=True)
+lna_H_noreion, Xe_H_noreion, ne_H_noreion, tau_H_noreion, dtaudx_H_noreion, ddtauddx_H_noreion, g_tilde_H_noreion, dgdx_H_noreion, ddgddx_H_noreion, sound_hor_H_noreion, Xe_saha_H_noreion = np.loadtxt('recombination_data/recombination_H_noreion.txt', unpack=True)
 
 # Recombination data: H, reionisation
-lna_H_reion, Xe_H_reion, ne_H_reion, tau_H_reion, dtaudx_H_reion, ddtauddx_H_reion, g_tilde_H_reion, dgdx_H_reion, ddgddx_H_reion, sound_hor_H_reion, Xe_saha_H_reion = np.loadtxt('recombination_H_reion.txt', unpack=True)
+lna_H_reion, Xe_H_reion, ne_H_reion, tau_H_reion, dtaudx_H_reion, ddtauddx_H_reion, g_tilde_H_reion, dgdx_H_reion, ddgddx_H_reion, sound_hor_H_reion, Xe_saha_H_reion = np.loadtxt('recombination_data/recombination_H_reion.txt', unpack=True)
 
 
 #===============

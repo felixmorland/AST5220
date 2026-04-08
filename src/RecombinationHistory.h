@@ -26,7 +26,7 @@ class RecombinationHistory{
     const double x_end    = Constants.x_end;
     
     // Numbers of points of Xe,ne array (modify as you see fit)
-    const int npts_rec_arrays = 5e5;
+    const int npts_rec_arrays = 5e3;
   
     // Xe for when to switch between Saha and Peebles
     const double Xe_saha_limit = 0.99;
@@ -61,7 +61,7 @@ class RecombinationHistory{
     Spline log_Xe_saha_of_x_spline{"Xe_saha"};
     Spline log_ne_saha_of_x_spline{"ne_saha"};
     Spline tau_of_x_spline{"tau"};
-    Spline log_tau_saha_of_x_spline{"tau"};
+    Spline tau_saha_of_x_spline{"tau"};
     Spline dtaudx_of_x_spline{"tau"}; 
     Spline g_tilde_of_x_spline{"g"};  
     Spline sound_horizon_spline{"sound_horizon"};
