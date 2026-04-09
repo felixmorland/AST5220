@@ -428,6 +428,10 @@ double RecombinationHistory::get_Yp() const{
   return Yp;
 }
 
+double RecombinationHistory::get_x_rec() const{
+  return Utils::binary_search_for_value(log_Xe_of_x_spline, log(0.1));
+}
+
 //====================================================
 // Print some useful info about the class
 //====================================================
@@ -492,7 +496,6 @@ void RecombinationHistory::output(const std::string filename) const{
     fp << ddgddx_tilde_of_x(x)            << " ";
     fp << get_sound_horizon(x)            << " ";
     fp << exp(log_Xe_saha_of_x_spline(x)) << " ";
-    // fp << exp(log_tau_saha_of_x_spline(x)) << " ";
     fp << "\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);

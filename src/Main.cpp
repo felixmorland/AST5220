@@ -29,8 +29,7 @@ int main(int argc, char **argv){
 
   // Recombination parameters
   double Yp          = 0.245;
-  bool reionisation  = false;
-  // double Yp          = 0.0;
+  bool reionisation  = true;
 
   // Power-spectrum parameters
   double A_s         = 2.1e-9;
@@ -50,10 +49,7 @@ int main(int argc, char **argv){
   // cosmo.output("fiducial_cosmology.txt");
   // cosmo.output("best_fit_cosmology.txt");
 
-  // Do the supernova fits. Uncomment when you are ready to run this
-  // Make sure you read the comments on the top of src/SupernovaFitting.h
   //  mcmc_fit_to_supernova_data("data/supernovadata.txt", "results_supernovafitting.txt");
-
 
   //=========================================================================
   // Module II
@@ -65,10 +61,7 @@ int main(int argc, char **argv){
   rec.info();
 
   // Output recombination quantities
-  rec.output("recombination_He_noreion.txt");
-  
-  // Remove when module is completed
-  return 0;
+  rec.output("recombination_data/recombination_He_noreion.txt");
 
   //=========================================================================
   // Module III
@@ -80,8 +73,8 @@ int main(int argc, char **argv){
   pert.info();
   
   // Output perturbation quantities
-  double kvalue = 0.01 / Constants.Mpc;
-  pert.output(kvalue, "perturbations_k0.01.txt");
+  double kvalue = 0.07 / Constants.Mpc;
+  pert.output(kvalue, "perturbation_data/perturbations_k0.01.txt");
   
   // Remove when module is completed
   return 0;

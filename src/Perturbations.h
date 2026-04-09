@@ -29,6 +29,10 @@ class Perturbations{
     const double x_start = Constants.x_start;
     const double x_end   = Constants.x_end;
 
+    // Neutrino fraction
+    double f_nu;
+
+
     // Below is a full list of splines you probably need, 
     // but you only need to make the splines you will need
 
@@ -49,7 +53,7 @@ class Perturbations{
     // NB: If you use there you have to allocate the container first
     // e.g. Theta_spline = std::vector<Spline2D>(n_ell_theta); before using it
     std::vector<Spline2D> Theta_spline;
-    std::vector<Spline2D> Theta_p_spline;
+    std::vector<Spline2D> ThetaP_spline;
     std::vector<Spline2D> Nu_spline;
     
     //==========================================================
@@ -65,7 +69,7 @@ class Perturbations{
     int rhs_tight_coupling_ode(double x, double k, const double *y, double *dydx);
     
     // Compute the time when tight coupling ends
-    double get_tight_coupling_time(const double k) const;
+    std::pair<double,int> get_tight_coupling_time(const double k, Vector x_array) const;
     
     //==========================================================
     // [2] The full ODE system 
