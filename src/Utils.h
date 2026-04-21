@@ -7,6 +7,8 @@
 #include <chrono>
 #include <map>
 #include <gsl/gsl_sf_bessel.h>
+#include <iomanip>
+#include <sstream>
 #ifdef _COMPLEX_BESSEL
 #include <complex_bessel.h>
 #endif
@@ -92,6 +94,7 @@ extern struct ConstantsAndUnits {
 namespace Utils {
   
   void progressbar(double progress);
+  std::string format_k(double k);
   // Find the x-value such that y(x) = y_value
   double binary_search_for_value(
       const Spline &y, 

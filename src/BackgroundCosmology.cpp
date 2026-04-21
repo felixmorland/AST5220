@@ -174,7 +174,7 @@ double BackgroundCosmology::get_OmegaMnu(double x) const {
     
 double BackgroundCosmology::get_comoving_distance_of_x(double x) const{
   // Comoving distance
-  return eta_of_x(0) - eta_of_x(x);
+  return eta_of_x(0.0) - eta_of_x(x);
 }
 
 double BackgroundCosmology::get_r_coordinate(double x) const {

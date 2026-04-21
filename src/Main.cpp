@@ -4,6 +4,8 @@
 #include "Perturbations.h"
 #include "PowerSpectrum.h"
 #include "SupernovaFitting.h"
+#include <iomanip>
+#include <sstream>
 
 int main(int argc, char **argv){
   Utils::StartTiming("Everything");
@@ -73,11 +75,15 @@ int main(int argc, char **argv){
   pert.info();
   
   // Output perturbation quantities
-  double kvalue = 0.07 / Constants.Mpc;
-  pert.output(kvalue, "perturbation_data/perturbations_k0.01.txt");
+  Vector kvalues{0.001, 0.01, 0.05, 0.1, 0.2};
   
-  // Remove when module is completed
-  return 0;
+  for (int i = 0; i < kvalues.size(); i++) {
+    double kvalue = kvalues[i] / Constants.Mpc;
+    std::string filename = "perturbation_data/perturbations_k" + Utils::format_k(kvalues[i]) + ".txt";
+    std::string source_func_filename = "perturbation_data/source_k" + Utils::format_k(kvalues[i]) + ".txt";
+    pert.pert_output(kvalue, filename);
+    pert.source_func_output(kvalue, source_func_filename);
+  }
   
   //=========================================================================
   // Module IV
@@ -85,10 +91,10 @@ int main(int argc, char **argv){
 
   PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
   power.solve();
-  power.output("cells.txt");
-  
-  // Remove when module is completed
-  return 0;
+  power.output_CMB_spectrum("power_spectrum_data/cells.txt");
+  power.output_matter_power_spectrum("power_spectrum_data/matter_ps.txt");
+  power.output_transfer_func("power_spectrum_data/transfer_func.txt");
 
   Utils::EndTiming("Everything");
+  return 0;
 }

@@ -31,6 +31,11 @@ class PowerSpectrum {
     const int n_k      = 100;
     const double k_min = Constants.k_min;
     const double k_max = Constants.k_max;
+
+    // The x-values
+    const int n_x        = 700;
+    const double x_start = Constants.x_start;
+    const double x_end   = Constants.x_end;
     
     // The ells's we will compute Theta_ell and Cell for
     Vector ells{ 
@@ -65,7 +70,10 @@ class PowerSpectrum {
     // for all ells by providing a source_function(x,k) (can be temp, pol, ...)
     Vector2D line_of_sight_integration_single(
         Vector & k_array, 
-        std::function<double(double,double)> &source_function);
+        Vector & x_array,
+        std::function<double(double,double)> &source_function,
+        std::string & func_name
+    );
     
     // Splines of the reusult of the LOS integration
     // Theta_ell(k) and ThetaE_ell(k) for polarization
@@ -115,7 +123,9 @@ class PowerSpectrum {
     double get_cell_EE(const double ell) const;
 
     // Output Cells in units of l(l+1)/2pi (muK)^2
-    void output(std::string filename) const;
+    void output_CMB_spectrum(std::string filename) const;
+    void output_matter_power_spectrum(std::string filename) const;
+    void output_transfer_func(std::string filename) const;
 };
 
 #endif

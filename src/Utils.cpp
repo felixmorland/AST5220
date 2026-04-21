@@ -58,6 +58,17 @@ namespace Utils{
       std::cout << "] " << int(progress * 100.0) << " %\r";
       std::cout.flush();
   }
+  // Lambda to format k value with minimal decimals
+  std::string format_k(double k) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(10) << k;
+    std::string str = ss.str();
+    // Remove trailing zeros
+    str.erase(str.find_last_not_of('0') + 1);
+    // Remove trailing decimal point if present
+    if (str.back() == '.') str.pop_back();
+    return str;
+  };
 
   // Find a value in a spline
   double binary_search_for_value(
