@@ -60,7 +60,7 @@ void PowerSpectrum::generate_bessel_function_splines(){
   // Compute splines for bessel functions j_ell(z)
   //=================================================================
   const double z_max   = k_max * cosmo->eta_of_x(0.0);
-  const double delta_z = M_PI / 32.0;
+  const double delta_z = M_PI / 8.0;
   const int n_z        = int(z_max / delta_z);
 
   Vector z_array = Utils::linspace(0.0, z_max, n_z);
@@ -104,37 +104,52 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
 
   // Set timestep
   const double dx = x_array[1] - x_array[0];
+  
+  // Loop over all ell
+  // for (int ell = 0; ell < ells.size(); ell++) {
+  //   Utils::progressbar(double(ell) / double(ells.size()));
+  //   double los_integral = 0.0;
 
+  //   for(int ik = 0; ik < k_array.size(); ik++){
+  //     const double k = k_array[ik];
+
+
+  //     // Trapezoidal integral
+  //     for (int ix = 0; ix < n_x; ix++) {
+
+  //       double S_tilde = source_function(x_array[ix], k);
+  //       double eta     = cosmo->eta_of_x(x_array[ix]);
+  //       double j_ell   = j_ell_splines[ell](k*(eta0 - eta)); 
+
+  //       if (ix == 0 || ix == n_x - 1) {
+  //         los_integral += S_tilde*j_ell/2.0;
+  //       }
+  //       else {
+  //         los_integral += S_tilde*j_ell;
+  //       }
+  //     }
+  //     // Store the result for Source_ell(k) in results[ell][ik]
+  //     result[ell][ik] = los_integral*dx;
+  //   }
+  // }
   // Loop over all k
   std::cout << "\nLine of sight integration: " << func_name << "...\n";
   for(int ik = 0; ik < k_array.size(); ik++){
     Utils::progressbar(double(ik) / double(k_array.size()));
     const double k = k_array[ik];
-    double los_integral;
 
-    // Loop over all ell
-    for (int ell = 0; ell < ells.size(); ell++) {
-
-      los_integral = 0.0;
-
-      // Trapezoidal integral
-      for (int ix = 0; ix < n_x; ix++) {
-
-        double S_tilde = source_function(x_array[ix], k);
-        double eta     = cosmo->eta_of_x(x_array[ix]);
+    Vector integral(ells.size(), 0.0);
+    for (int ix = 0; ix < n_x; ix++) {
+      double S_tilde = source_function(x_array[ix], k);
+      double eta     = cosmo->eta_of_x(x_array[ix]);
+      for (int ell = 0; ell < ells.size(); ell++) {
         double j_ell   = j_ell_splines[ell](k*(eta0 - eta));
-
-        // std::cout << "func: " << func_name << ", S_tilde: " << S_tilde << ", eta: " << eta << ", j_ell: " << j_ell << "\n\n"; 
-
-        if (ix == 0 || ix == n_x - 1) {
-          los_integral += S_tilde*j_ell/2.0;
-        }
-        else {
-          los_integral += S_tilde*j_ell;
-        }
+        integral[ell] += S_tilde*j_ell;
       }
-      // Store the result for Source_ell(k) in results[ell][ik]
-      result[ell][ik] = los_integral*dx;
+    }
+
+    for (int ell = 0; ell < ells.size(); ell++) {
+      result[ell][ik] = integral[ell]*dx;
     }
   }
   std::cout << "\n";

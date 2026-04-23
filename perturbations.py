@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 
 # Plot colors and linestyles
@@ -37,9 +38,9 @@ for k in k_array:
     }
 
 ###########################
-# THETA0                  #
+# MONOPOLES               #
 ###########################
-fig, axs = plt.subplots(2, 1, figsize=(6,8))
+fig, axs = plt.subplots(2, 1, figsize=(6,6.5), sharex=True)
 
 for k, c in zip(k_array, custom_col):
     x       = data[k]['x']
@@ -49,23 +50,46 @@ for k, c in zip(k_array, custom_col):
     v_Nu        = -3.0*data[k]['Nu1']
 
     # Density perturbations
-    axs[0].plot(x, delta_gamma, color=c, alpha=0.5, label=r'$k=$'+f' {k}'+r'/Mpc')
+    axs[0].plot(x, delta_gamma, color=c, alpha=0.5)
     axs[0].plot(x, delta_Nu, color=c, linestyle='dashed')
 
     # Velocity perturbations
-    axs[1].plot(x, v_gamma, color=c, alpha=0.5, label=r'$k=$'+f' {k}'+r'/Mpc')
+    axs[1].plot(x, v_gamma, color=c, alpha=0.5)
     axs[1].plot(x, v_Nu, color=c, linestyle='dashed')
 
-axs[0].legend(loc='lower left')
+line_solid = Line2D([], [], color='black', linestyle='-')
+line_solid_faded = Line2D([], [], color='black', linestyle='-', alpha=0.5)
+line_dashed = Line2D([], [], color='black', linestyle='dashed')
+
+fig.legend(
+    loc='lower center', 
+    labels=[r'$k=$'+f' {k}/Mpc' for k in k_array], 
+    handles=[Line2D([], [], color=col, linestyle='-') for col in custom_col[0:3]],
+    ncols=3
+)
+axs[0].legend(
+    loc='lower left', 
+    labels=[r'$\delta_\gamma=4\Theta_0$', r'$\delta_\nu=4\mathcal{N}_0$'], 
+    handles=[line_solid_faded, line_dashed]
+)
+axs[1].legend(
+    loc='lower left', 
+    labels=[r'$v_\gamma=-3\Theta_1$', r'$v_\nu = -3\mathcal{N}_1$'], 
+    handles=[line_solid_faded, line_dashed]
+)
+
 axs[0].set_xlim(x[0], x[-1])
-axs[0].set_xlabel(r'$x=\ln a$')
-axs[0].set_ylabel(r'$\Theta_0(x,k)$')
+axs[1].set_xlabel(r'$x=\ln a$')
+axs[0].set_ylabel(r'$\delta_\gamma, \;\delta_\nu$')
+axs[1].set_ylabel(r'$v_\gamma, \;v_\nu$')
+
+fig.subplots_adjust(hspace=0, bottom=0.15)
 fig.savefig('figures/radiation_pert.pdf')
 
 ###########################
 # DENSITY PERT            #
 ###########################
-fig, axs = plt.subplots(2, 1, figsize=(6,8))
+fig, axs = plt.subplots(2, 1, figsize=(6,6.5), sharex=True)
 
 for k, c in zip(k_array, custom_col):
     x           = data[k]['x']
@@ -74,43 +98,64 @@ for k, c in zip(k_array, custom_col):
     v_b         = data[k]['v_b']
     v_cdm       = data[k]['v_cdm']
 
-    axs[0].plot(x, abs(delta_cdm), color=c, alpha=0.5, label=r'$k=$'+f' {k}'+r'/Mpc')
+    axs[0].plot(x, abs(delta_cdm), color=c, alpha=0.5)
     axs[0].plot(x, abs(delta_b), color=c, linestyle='dashed')
 
-    axs[1].plot(x, abs(v_cdm), color=c, alpha=0.5, label=r'$k=$'+f' {k}'+r'/Mpc')
+    axs[1].plot(x, abs(v_cdm), color=c, alpha=0.5)
     axs[1].plot(x, abs(v_b), color=c, linestyle='dashed')
     
-axs[0].legend(loc='upper left')
 axs[0].set_yscale('log')
 axs[1].set_yscale('log')
 axs[0].set_xlim(x[0], x[-1])
 axs[0].set_xlabel(r'$x=\ln a$')
 axs[0].set_ylabel(r'$|\delta_b|,\;|\delta_\mathrm{CDM}|$')
+axs[1].set_ylabel(r'$|v_b|,\;|v_\mathrm{CDM}|$')
+
+fig.legend(
+    loc='lower center', 
+    labels=[r'$k=$'+f' {k}/Mpc' for k in k_array], 
+    handles=[Line2D([], [], color=col, linestyle='-') for col in custom_col[0:3]],
+    ncols=3
+)
+axs[0].legend(
+    loc='upper left', 
+    labels=[r'$|\delta_b|$', r'$|\delta_\mathrm{CDM}|$'], 
+    handles=[line_solid_faded, line_dashed]
+)
+axs[1].legend(
+    loc='upper left', 
+    labels=[r'$|v_b|$', r'$|v_\mathrm{CDM}|$'], 
+    handles=[line_solid_faded, line_dashed]
+)
+
+fig.subplots_adjust(hspace=0, bottom=0.15)
 fig.savefig('figures/matter_pert.pdf')
 
 ###########################
 # PHI, PSI                #
 ###########################
-fig, axs = plt.subplots(2,1)
+fig, axs = plt.subplots(2, 1, figsize=(6,5), sharex=True)
 
 for k, c in zip(k_array, custom_col):
     x           = data[k]['x']
     Phi         = data[k]['Phi']
     Psi         = data[k]['Psi']
-    axs[0].plot(x, Phi, color=c, alpha=0.5, label=r'$k=$'+f' {k}'+r'/Mpc')
-    axs[0].plot(x, Psi, color=c, linestyle='dashed')
-    axs[1].plot(x, Phi+Psi, color=c)
+    axs[0].plot(x, Phi, color=c, label=r'$k=$'+f' {k}'+r'/Mpc')
+    axs[1].plot(x, Phi+Psi, color=c, label=r'$k=$'+f' {k}'+r'/Mpc')
 
-axs[0].legend(loc='upper left')
+axs[0].legend(loc='center left', fontsize=12)
 axs[0].set_xlim(x[0], x[-1])
-axs[0].set_xlabel(r'$x=\ln a$')
-axs[0].set_ylabel(r'$|\delta_b|,\;|\delta_\mathrm{CDM}|$')
+axs[1].set_xlabel(r'$x=\ln a$')
+axs[0].set_ylabel(r'$\Phi$')
+axs[1].set_ylabel(r'$\Phi+\Psi$')
+
+fig.subplots_adjust(hspace=0, bottom=0.15)
 fig.savefig('figures/phi_psi_pert.pdf')
 
 ###########################
 # PHOTON POLARIZATION     #
 ###########################
-fig, axs = plt.subplots(3, 1, figsize=(6,10), sharex=True, )
+fig, axs = plt.subplots(3, 1, figsize=(6,9), sharex=True, )
 
 for k, c in zip(k_array[::-1], custom_col[2::-1]):
     x           = data[k]['x']
@@ -144,3 +189,7 @@ fig.subplots_adjust(hspace=0, bottom=0.12)
 # ax.set_xlabel(r'$x=\ln a$')
 # ax.set_ylabel(r'$|\delta_b|,\;|\delta_\mathrm{CDM}|$')
 fig.savefig('figures/polarization_pert.pdf')
+
+
+plt.plot(x, Pi)
+plt.show()

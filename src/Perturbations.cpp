@@ -501,8 +501,8 @@ void Perturbations::compute_source_functions(
       ST_array[index] = SW_term + ISW_term + Doppler_term + Polarization_term;
 
       if(Constants.polarization){
-        SE_array[index] = (x <= -3.0) ?
-                          3.0*g_tilde*Pi / (4.0*Hp*pow(k*chi, 2.0)) :
+        SE_array[index] = (x <= -2.5) ?
+                          3.0*g_tilde*Pi / (4.0*pow(k*chi, 2.0)) :
                           SE_array[index - 1];
       }
     }
@@ -695,7 +695,7 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   ddelta_cdmdx = (c*k/Hp)*v_cdm - 3.0*dPhidx;
   dv_cdmdx     = -v_cdm - (c*k/Hp)*Psi;
   ddelta_bdx   = (c*k/Hp)*v_b - 3.0*dPhidx;
-  dv_bdx       = -v_b - (c*k/Hp)*Psi + dtaudx*R*(*(Theta+1) + v_b/3.0);
+  dv_bdx       = -v_b - (c*k/Hp)*Psi + dtaudx*R*(3.0* *(Theta+1) + v_b);
 
   //====================================
   // Photon multipoles (Theta_ell)
