@@ -93,8 +93,9 @@ int main(int argc, char **argv){
   power.solve();
   power.output_CMB_spectrum("power_spectrum_data/cells.txt");
   power.output_matter_power_spectrum("power_spectrum_data/matter_ps.txt");
-  power.output_transfer_func("power_spectrum_data/transfer_func.txt");
-
+  power.output_transfer_func("power_spectrum_data/transfer_funcT.txt", power.get_thetaT_ell_of_k_spline());
+  power.output_transfer_func("power_spectrum_data/transfer_funcE.txt", power.get_thetaE_ell_of_k_spline());
+  
   Utils::EndTiming("Everything");
   return 0;
 }

@@ -121,11 +121,14 @@ class PowerSpectrum {
     double get_cell_TT(const double ell) const;
     double get_cell_TE(const double ell) const;
     double get_cell_EE(const double ell) const;
+    
+    std::vector<Spline> get_thetaT_ell_of_k_spline() const;
+    std::vector<Spline> get_thetaE_ell_of_k_spline() const;
 
     // Output Cells in units of l(l+1)/2pi (muK)^2
     void output_CMB_spectrum(std::string filename) const;
     void output_matter_power_spectrum(std::string filename) const;
-    void output_transfer_func(std::string filename) const;
+    void output_transfer_func(std::string filename, std::vector<Spline> theta_spline) const;
 };
 
 #endif

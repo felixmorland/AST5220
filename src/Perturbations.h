@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <limits>
 #include "Utils.h"
 #include "BackgroundCosmology.h"
 #include "RecombinationHistory.h"
@@ -20,7 +21,7 @@ class Perturbations{
     RecombinationHistory *rec  = nullptr;
    
     // The scales we integrate over
-    const int n_k        = 100;
+    const int n_k        = 200;
     const double k_min   = Constants.k_min;
     const double k_max   = Constants.k_max;
     
@@ -135,6 +136,7 @@ class Perturbations{
     double get_Nu(const double x, const double k, const int ell) const;
     double get_Source_T(const double x, const double k) const;
     double get_Source_E(const double x, const double k) const;
+    double get_horizon_enter(const double k) const;
 };
 
 #endif

@@ -813,6 +813,23 @@ double Perturbations::get_Theta_p(const double x, const double k, const int ell)
 double Perturbations::get_Nu(const double x, const double k, const int ell) const{
   return Nu_spline[ell](x,k);
 }
+double Perturbations::get_horizon_enter(const double k) const{
+  int n_sample          = 1e6;
+  Vector x_sample       = Utils::linspace(x_start, x_end, n_sample);
+  double c              = Constants.c;
+
+  double horizon_enter_x;
+  for (int i = 0; i < n_sample; i++) {
+    double x = x_sample[i];
+    double Hp = cosmo->Hp_of_x(x);
+
+    if (k*c/Hp >= 1.0) {
+      return x;
+    }
+  }
+  // Never crosses 1, return NaN
+  return std::numeric_limits<double>::quiet_NaN();
+}
 
 //====================================================
 // Print some useful info about the class
@@ -878,6 +895,7 @@ void Perturbations::pert_output(const double k, const std::string filename) cons
   std::ofstream fp(filename.c_str());
   const int npts = 5000;
   auto x_array = Utils::linspace(x_start, x_end, npts);
+  fp << get_horizon_enter(k) << "\n";
   auto print_data = [&] (const double x) {
     fp << x                     << " ";
     fp << get_Theta(x,k,0)      << " ";

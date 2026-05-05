@@ -296,6 +296,12 @@ double PowerSpectrum::get_cell_TE(const double ell) const{
 double PowerSpectrum::get_cell_EE(const double ell) const{
   return cell_EE_spline(ell);
 }
+std::vector<Spline> PowerSpectrum::get_thetaT_ell_of_k_spline() const{
+  return thetaT_ell_of_k_spline;
+}
+std::vector<Spline> PowerSpectrum::get_thetaE_ell_of_k_spline() const{
+  return thetaE_ell_of_k_spline;
+}
 
 //====================================================
 // Output the cells to file
@@ -308,14 +314,17 @@ void PowerSpectrum::output_CMB_spectrum(std::string filename) const{
   auto ellvalues = Utils::linspace(2, ellmax, ellmax-1);
   auto print_data = [&] (const double ell) {
     double normfactor  = (ell * (ell+1)) / (2.0 * M_PI) * pow(1e6 * cosmo->get_TCMB(), 2);
+    double normfactor_TE  = sqrt((ell+2.0) * (ell+1.0) * ell * (ell-1.0)) * normfactor;
+    double normfactor_EE  = (ell+2.0) * (ell+1.0) * ell * (ell-1.0)
+                            * 1e5 * pow(1e6*cosmo->get_TCMB(), 2.0);
     double normfactorN = (ell * (ell+1)) / (2.0 * M_PI) 
       * pow(1e6 * cosmo->get_TCMB() *  pow(4.0/11.0, 1.0/3.0), 2);
     double normfactorL = (ell * (ell+1)) * (ell * (ell+1)) / (2.0 * M_PI);
     fp << ell                                 << " ";
     fp << cell_TT_spline( ell ) * normfactor  << " ";
     if(Constants.polarization){
-      fp << cell_EE_spline( ell ) * normfactor  << " ";
-      fp << cell_TE_spline( ell ) * normfactor  << " ";
+      fp << cell_EE_spline( ell ) * normfactor_EE  << " ";
+      fp << cell_TE_spline( ell ) * normfactor_TE  << " ";
     }
     fp << "\n";
   };
@@ -332,7 +341,7 @@ void PowerSpectrum::output_matter_power_spectrum(std::string filename) const{
   };
   std::for_each(k_array.begin(), k_array.end(), print_data);
 }
-void PowerSpectrum::output_transfer_func(std::string filename) const{
+void PowerSpectrum::output_transfer_func(std::string filename, std::vector<Spline> theta_spline) const{
 
   std::ofstream fp(filename.c_str());
   fp << "k ";
@@ -342,14 +351,15 @@ void PowerSpectrum::output_transfer_func(std::string filename) const{
   }
   fp << "\n";
 
-  auto k_array = exp(Utils::linspace(log(k_min), log(k_max), 2000));
+  auto k_array = exp(Utils::linspace(log(k_min), log(k_max), 5000));
   auto print_data = [&] (const double k) {
     fp << k * Constants.Mpc                        << " ";
     for (int i = 0; i < ells.size(); i++){
-      fp << thetaT_ell_of_k_spline[i](k)           << " ";
-    } 
+      fp << theta_spline[i](k)           << " ";
+    }
     fp << "\n";
   };
   std::for_each(k_array.begin(), k_array.end(), print_data);
 }
+
 
