@@ -153,7 +153,7 @@ for k, c in zip(k_array, custom_col):
     horizon_enter   = data[k]['horizon_enter']
     Phi             = data[k]['Phi']
     Psi             = data[k]['Psi']
-
+    print(f'Phi today k={k}: {Phi[-1]}')
     axs[0].plot(x, Phi, color=c, alpha=0.5)
     axs[0].plot(x, Psi, color=c, linestyle='dashed')
     axs[1].plot(x, Phi+Psi, color=c, label=r'$k=$'+f' {k}'+r'/Mpc')
@@ -177,6 +177,7 @@ axs[1].set_ylabel(r'$\Phi+\Psi$')
 
 fig.subplots_adjust(hspace=0, bottom=0.15, left=0.15)
 fig.savefig('figures/phi_psi_pert.pdf')
+
 
 
 

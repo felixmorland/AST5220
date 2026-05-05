@@ -134,8 +134,7 @@ for k in kvalues:
 ###############################
 fig, ax = plt.subplots(1, 1, figsize=(8,6))
 
-h = 0.67
-ax.plot(k_array/h, matter_ps/(h**3), label=r'Theory')
+ax.plot(k_array, matter_ps, label=r'Theory')
 
 ax.errorbar(SDSS_gal[:,0], SDSS_gal[:,1], 
             yerr=SDSS_gal[:,2], markersize=3,
@@ -150,7 +149,7 @@ ax.errorbar(WMAP_ACT[:,0], WMAP_ACT[:,1],
 
 ax.set_xscale('log')
 ax.set_yscale('log')
-ax.set_xlim(1e-3, k_array[-1]/h)
+ax.set_xlim(1e-3, k_array[-1])
 ax.legend()
 
 fig.savefig('figures/matter_power_spectrum.pdf')

@@ -279,7 +279,7 @@ double PowerSpectrum::get_matter_power_spectrum(const double x, const double k) 
   double Phi  = pert->get_Phi(x,k);
   double Delta_M = 2.0 / 3.0 * pow(Constants.c*k / Hp, 2.0) * Phi;
 
-  double pofk = 2.0 * pow(M_PI * Delta_M, 2.0) * pow(k * Constants.Mpc, -3.0) * primordial_power_spectrum(k);
+  double pofk = 2.0 * pow(M_PI * Delta_M, 2.0) * pow(k, -3.0) * primordial_power_spectrum(k);
 
   return pofk;
 }
@@ -333,10 +333,12 @@ void PowerSpectrum::output_CMB_spectrum(std::string filename) const{
 void PowerSpectrum::output_matter_power_spectrum(std::string filename) const{
 
   std::ofstream fp(filename.c_str());
+
   auto k_array = exp(Utils::linspace(log(k_min), log(k_max), 2000));
+  double h     = cosmo->get_h();
   auto print_data = [&] (const double k) {
-    fp << k * Constants.Mpc                             << " ";
-    fp << get_matter_power_spectrum(0.0, k)             << " "; 
+    fp << k * Constants.Mpc / h                                     << " ";
+    fp << get_matter_power_spectrum(0.0, k) / pow(Constants.Mpc / h, 3.0)     << " "; 
     fp << "\n";
   };
   std::for_each(k_array.begin(), k_array.end(), print_data);
