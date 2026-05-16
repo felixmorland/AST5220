@@ -15,19 +15,15 @@ int main(int argc, char **argv){
   //=========================================================================
 
   // Background parameters
+  double h           = 0.67;
+  double OmegaCDM    = 0.267;
+  double OmegaK      = 0.0;
   double OmegaB      = 0.05;
   double Neff        = 3.046;
   double TCMB        = 2.7255;
 
-  // Fiducial parameters
-  double h           = 0.67;
-  double OmegaCDM    = 0.267;
-  double OmegaK      = 0.0;
-
-  // Best-fit parameters
-  // double h           = 0.701711;
-  // double OmegaCDM    = 0.205027;
-  // double OmegaK      = 0.0789514;
+  bool neutrinos     = true;
+  bool polarization  = true;
 
   // Recombination parameters
   double Yp          = 0.245;
@@ -48,9 +44,9 @@ int main(int argc, char **argv){
   cosmo.info();
   
   // Output background evolution quantities
-  // cosmo.output("fiducial_cosmology.txt");
-  // cosmo.output("best_fit_cosmology.txt");
+  cosmo.output("fiducial_cosmology.txt");
 
+  // MCMC algorithm 
   //  mcmc_fit_to_supernova_data("data/supernovadata.txt", "results_supernovafitting.txt");
 
   //=========================================================================
@@ -63,7 +59,7 @@ int main(int argc, char **argv){
   rec.info();
 
   // Output recombination quantities
-  rec.output("recombination_data/recombination_He_noreion.txt");
+  rec.output("recombination_data/recombination_He_reion.txt");
 
   //=========================================================================
   // Module III
@@ -95,7 +91,7 @@ int main(int argc, char **argv){
   power.output_matter_power_spectrum("power_spectrum_data/matter_ps.txt");
   power.output_transfer_func("power_spectrum_data/transfer_funcT.txt", power.get_thetaT_ell_of_k_spline());
   power.output_transfer_func("power_spectrum_data/transfer_funcE.txt", power.get_thetaE_ell_of_k_spline());
-  
+
   Utils::EndTiming("Everything");
   return 0;
 }

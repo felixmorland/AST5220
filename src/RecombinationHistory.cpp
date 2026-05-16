@@ -79,8 +79,8 @@ void RecombinationHistory::solve_number_density_electrons(){
     Xe_arr[i]         = (Yp != 0) ? Xe_saha_arr_with_He[i] : Xe_saha_arr[i];
     Xe_peebles_arr[i] = Xe_arr[i];
 
-    double nb  = OmegaB0 * rho_crit0 / (Constants.m_H * exp(3.0*x_array[i]));
-    ne_arr[i]  = Xe_arr[i] * nb;
+    double nH  = (1-Yp) * OmegaB0 * rho_crit0 / (Constants.m_H * exp(3.0*x_array[i]));
+    ne_arr[i]  = Xe_arr[i] * nH;
   }
 
   if(switch_idx < npts_rec_arrays){
@@ -107,8 +107,8 @@ void RecombinationHistory::solve_number_density_electrons(){
       Xe_peebles_arr[i] = peebles_Xe_array[peebles_idx];
       Xe_arr[i]         = Xe_peebles_arr[i];
 
-      double nb  = OmegaB0 * rho_crit0 / (Constants.m_H * exp(3.0*x_array[i]));
-      ne_arr[i]  = Xe_arr[i] * nb;
+      double nH  = (1-Yp) * OmegaB0 * rho_crit0 / (Constants.m_H * exp(3.0*x_array[i]));
+      ne_arr[i]  = Xe_arr[i] * nH;
     }
   }
 
@@ -124,8 +124,8 @@ void RecombinationHistory::solve_number_density_electrons(){
                 + (1.0+f_He)/2.0 * (1.0 + tanh((y_reion  - y) / dy_reion ))
                 +       f_He/2.0 * (1.0 + tanh((z_Hereion - z) / dz_Hereion));
 
-      double nb  = OmegaB0 * rho_crit0 / (Constants.m_H * exp(3.0*x_array[i]));
-      ne_arr[i]  = Xe_arr[i] * nb;
+      double nH  = (1-Yp) * OmegaB0 * rho_crit0 / (Constants.m_H * exp(3.0*x_array[i]));
+      ne_arr[i]  = Xe_arr[i] * nH;
     }
   }
 
@@ -183,7 +183,7 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   
   // Electron fraction and number density
   double Xe = (A < 400.0) ? 0.5 * A * (sqrt(1 + 4.0/A) - 1) : 1;
-  double ne = Xe * nb;
+  double ne = (1-Yp) * Xe * nb;
   
   return std::pair<double,double>(Xe, ne);
 }
@@ -243,7 +243,7 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   }
 
   double Xe = fe / (1-Yp);
-  double ne = Xe * nb;
+  double ne = (1-Yp) * Xe * nb;
   
   return std::pair<double,double>(Xe, ne);
 }
@@ -448,7 +448,7 @@ void RecombinationHistory::info() const{
   std::cout << "Yp:                          " << Yp                                << "\n";
   std::cout << "Reionisation:                " << std::boolalpha << reionisation    << "\n\n";
 
-  std::cout << "Decoupling\n----------------------------------------\n";
+  std::cout << "Decoupling\n-------------------------------------\n";
   std::cout << "x_dec:                 " << x_dec                                        << "\n";
   std::cout << "z_dec:                 " << exp(-x_dec) - 1.0                            << "\n";
   std::cout << "t_dec:                 " << cosmo->get_t_of_x(x_dec) / Constants.Gyr     << "\n\n";
@@ -458,12 +458,12 @@ void RecombinationHistory::info() const{
   std::cout << "z_rec:                " << exp(-x_rec) - 1.0                             << "\n";
   std::cout << "t_rec:                " << cosmo->get_t_of_x(x_rec) / Constants.Gyr      << "\n\n";
 
-  std::cout << "Decoupling (SAHA)\n----------------------------------\n";
+  std::cout << "Decoupling (SAHA)\n-------------------------------------\n";
   std::cout << "x_dec_saha:           " << x_dec_saha                                    << "\n";
   std::cout << "z_dec_saha:           " << exp(-x_dec_saha) - 1.0                        << "\n";
   std::cout << "t_dec_saha:           " << cosmo->get_t_of_x(x_dec_saha) / Constants.Gyr << "\n\n";
 
-  std::cout << "Recombination (SAHA)\n-------------------------------\n";
+  std::cout << "Recombination (SAHA)\n-------------------------------------\n";
   std::cout << "x_rec_saha:           " << x_rec_saha                                    << "\n";
   std::cout << "z_rec_saha:           " << exp(-x_rec_saha) - 1.0                        << "\n";
   std::cout << "t_rec_saha:           " << cosmo->get_t_of_x(x_rec_saha) / Constants.Gyr << "\n\n";

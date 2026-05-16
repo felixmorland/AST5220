@@ -6,6 +6,7 @@
 \usepackage{todonotes}
 \usepackage{enumitem}
 \usepackage{multirow}
+
 % \usepackage{caption}
 % \usepackage[options]{hyperref}
 
@@ -50,11 +51,11 @@
 \section*{0. Introduction}
 I will write an introduction for the whole project at the end, once I have completed all the milestones.
 
-% \begin{figure}[h!]
-%       \centering
-%       \includegraphics[width=0.9\linewidth]{../figures/cmb.png}
-%       \caption{CMB \citep{cmb}}
-% \end{figure}
+\begin{figure}[h!]
+      \centering
+      \includegraphics[width=0.9\linewidth]{../figures/cmb_wmap.png}
+      \caption{CMB \citep{cmb}}
+\end{figure}
 
 
 
@@ -79,7 +80,7 @@ In this section, we will present the relevant theory for developping the backgro
 For our background cosmology, we assume an isotropic and homogeneous Universe with a spatial scale factor $a(t)$ equipped with the Friedmann-Lemaître-Robertson-Walker (FLRW) metric
 
 \begin{align}
-      ds^2 = -dt^2 + a^2(t)\Big(dx^2+dy^2+dz^2\Big),\label{eq:FLRW metric}
+      \d s^2 = -\d t^2 + a^2(t)\Big(\d x^2+\d y^2+\d z^2\Big),\label{eq:FLRW metric}
 \end{align}
 or, on component form; $g_{00}=-1$, $g_{ij} = a^2(t)\delta_{ij}$.
 
@@ -90,9 +91,10 @@ T_{\mu\nu}^{(i)} = \mathrm{diag}(\rho_i, p_i, p_i, p_i),
 with $\rho_i$ denoting the density and $p_i$ the pressure of that component.
 
 The resulting Einstein field equations for the FLRW metric and the sum of the stress-energy tensors for the perfect fluids,
-\begin{align*}
-      R_{\mu\nu}-\frac{1}{2}Rg_{\mu\nu} + \Lambda g_{\mu\nu} = 8\pi G\sum_i T^{(i)}_{\mu\nu},
-\end{align*}
+\begin{align}
+      G_{\mu\nu} + \Lambda g_{\mu\nu} = 8\pi G\sum_i T^{(i)}_{\mu\nu},
+      \label{eq:GR}
+\end{align}
 we get the Friedmann equations. The (00) component of the Einstein equations gives us the first equation,
 \begin{align}
       H^2(a) \equiv \bigg(\frac{\dot{a}}{a}\bigg)^2 = \frac{8\pi G}{3}\sum_i \rho_i,\label{eq:Friedmann 1st}
@@ -134,7 +136,7 @@ or on integral form
       t(x) = \int_{-\infty}^x \frac{\d x'}{H(x')} .\label{eq:t(x)}
 \end{align}
 
-However, we also consider the \textit{conformal time} $\eta$ which is the distance that light may have travelled since the Big Bang (horizon). It is related to the cosmic time thorugh the relation
+However, we also consider the \textit{conformal time} $\eta$ which is the distance that light may have travelled since the Big Bang (horizon). It is related to the cosmic time through the relation
 \begin{equation*}
       a\d \eta = c\d t \;\Rightarrow\; \dd{\eta}{x} = \frac{c}{aH}.
 \end{equation*}
@@ -586,6 +588,37 @@ The final freeze-out abundance of free electrons today was calculated to be $X_e
 \end{minipage}
 \end{table*}
 
+% Yp:                          0.245
+% Reionisation:                false
+
+% Decoupling
+% ----------------------------------------
+% x_dec:                 -6.99474
+% z_dec:                 1089.88
+% t_dec:                 0.00037211
+
+% Recombination
+% -------------------------------------
+% x_rec:                -6.97013
+% z_rec:                1063.36
+% t_rec:                0.000387835
+
+% Decoupling (SAHA)
+% ----------------------------------
+% x_dec_saha:           -7.17033
+% z_dec_saha:           1299.28
+% t_dec_saha:           0.000276427
+
+% Recombination (SAHA)
+% -------------------------------
+% x_rec_saha:           -7.14035
+% z_rec_saha:           1260.87
+% t_rec_saha:           0.000290885
+
+% Sound horizon at decoupling: 144.413
+% Freeze-out Xe(0):            0.000267362
+% Integral of g_tilde:         1
+
 \subsubsection{The optical depth and visibility function}
 
 \begin{figure*}
@@ -605,7 +638,7 @@ Including helium, as in panels~(c) and~(d), leaves its most visible imprint on t
 
 \begin{figure}[h!]
       \centering
-      \includegraphics[width=0.95\linewidth]{../figures/visibility_functions.pdf}
+      \includegraphics[width=0.99\linewidth]{../figures/visibility_functions.pdf}
       \caption{Visibility function $\tilde{g}$ and its two first derivatives $\tilde{g}',\,\tilde{g}''$ as functions of $x$ for the Universe with both hydrogen and helium ($Y_p=0.245$) and late-stage reionisation.} 
       \label{fig:visibility func} 
 \end{figure}
@@ -620,115 +653,411 @@ The small bump visible at $x \sim -2.5$ corresponds to reionisation, where the r
 
 Evaluating the sound horizon at decoupling $r_s$ for the fiducial model, i.e. at $x_\mathrm{dec} = -6.9728$ (corresponding to redshift $z_\mathrm{dec} = 1066.23$), we find
 \begin{equation*}
-    r_s \equiv s(x_\mathrm{dec}) \simeq 146.501\;\mathrm{Mpc}.
+    r_s \equiv s(x_\mathrm{dec}) \simeq 144.413\;\mathrm{Mpc}.
 \end{equation*}
 This value is in good agreement with the standard result from \textit{Planck} \citep{planck2020}, and sets a fundamental physical scale in the Universe. At decoupling there is no longer any radiative pressure to counteract the gravitational collapse of the baryons, so the acoustic oscillations in the photon-baryon plasma are frozen in place, and the sound horizon marks the maximum distance over which these oscillations could have coherently developed. This scale is directly imprinted as the characteristic angular separation of the acoustic peaks in the CMB power spectrum, and as the baryon acoustic oscillation (BAO) scale in the matter power spectrum.
-\td{Comment pure Saha decoupling/recombination and Peebles}
-% Yp:                          0.245
-% Reionisation:                false
-
-% Decoupling
-% ----------------------------------------
-% x_dec:                 -6.97282
-% z_dec:                 1066.23
-% t_dec:                 0.000386082
-
-% Recombination
-% -------------------------------------
-% x_rec:                -6.97013
-% z_rec:                1063.36
-% t_rec:                0.000387835
-
-% Decoupling (SAHA)
-% ----------------------------------
-% x_dec_saha:           -6
-% z_dec_saha:           402.429
-% t_dec_saha:           0.00189596
-
-% Recombination (SAHA)
-% -------------------------------
-% x_rec_saha:           -7.14035
-% z_rec_saha:           1260.87
-% t_rec_saha:           0.000290885
-
-% Sound horizon at decoupling: 146.501
-% Integral of g_tilde:         1
+\td{
+Comment pure Saha decoupling/recombination and Peebles\\
+Update data in table
+}
 
 
 
+\section{Perturbations}
 
+ In this section we perturb the metric and the distribution functions of each species around their homogeneous backgrounds and study how these perturbations evolve. We first introduce the theoretical framework, covering the perturbed metric in Newtonian gauge, the Boltzmann hierarchies governing each species, and the adiabatic initial conditions from inflation. We then describe the numerical implementation, including the tight-coupling approximation used to stabilise the integration through recombination, before presenting the resulting evolution of the matter, metric, and polarisation perturbations.
 
-
-
-\section{Evolution of structure in the Universe: introducing perturbations}
-Some introduction about what it is all about.
 
 \subsection{Theory}
-The theory behind this milestone.
+The perturbation theory presented in this section iis heavily inspired by Petter Callin and Hans A. Winther \citep{callin2006,winther_milestone3,winther_lectures}. We will mainly cover the notation used as well as the main equations governing the pertubations without diving too much into the details. For a more thorough derivation of all the perturbation equations, I would suggest reading the lecture notes by Winther \citep{winther_lectures}.
+
+\subsubsection{Setting up the perturbations}
+
+
+Working in Newtonian gauge, we perturb the FLRW metric, Eq.~(\ref{eq:FLRW metric}), by introducing two scalar gravitational potentials $\Psi(t,\vec{x})$ and $\Phi(t,\vec{x})$, giving the line element
+\begin{align}
+    \d s^2 = -(1+2\Psi)\,\d t^2 + a^2(1+2\Phi)\left(\d x^2 + \d y^2 + \d z^2\right).
+    \label{eq:pert metric}
+\end{align}
+Both potentials are closely related to the Newtonian gravitational potential. We restrict ourselves to scalar perturbations, which dominate our Universe and are therefore the most cosmologically relevant for our model.
+
+Perturbations to the photon distribution are described in Fourier space by the relative temperature fluctuation
+\begin{equation*}
+    \Theta(t,\vec{k},\mu) \equiv \frac{\delta T_\text{CMB}(t,\vec{k},\mu)}{\bar{T}_\text{CMB}(t)},
+\end{equation*}
+so that $T_\text{CMB} = \bar{T}_\text{CMB}(1+\Theta)$. Here $\vec{k}$ is the Fourier-space conjugate to the spatial position vector $\vec{x}$, and $\mu \equiv \hat{\vec{k}}\cdot\hat{\vec{p}}$ is the cosine of the angle between $\vec{k}$ and the photon momentum $\vec{p}$. We work in Fourier space because the spatial homogeneity of the background ensures that different Fourier modes $\vec{k}$ evolve independently, turning the perturbation PDEs into a separate ODE system for each $k$.
+
+Crucially, $\Theta$ depends only on the direction of $\vec{p}$, not its magnitude; it is this directional dependence that gives rise to the temperature anisotropies observed in the CMB. This motivates expanding the photon perturbation in multipoles
+\begin{align*}
+      \Theta_\ell(t,k) = \frac{i^\ell}{2}\int_{-1}^1P_\ell (\mu) \Theta(t,k,\mu)\d \mu,
+\end{align*}
+using the Legendre polynomials $P_\ell(\mu)$ (see Appendix \ref{appendix:legendre}). The expansion of $\Theta$ in the multipoles is then given by
+\begin{equation}
+      \Theta(t,k,\mu) = \sum_{\ell=0}^{\infty}\frac{2\ell + 1}{i^\ell}\Theta_\ell(t,k)P_\ell(\mu).
+      \label{eq:theta expansion}
+\end{equation}
+The same multipole expansion will be done for the perturbations to the photon polarisation $\Theta_P$ and the neutrino perturbations $\mathcal{N}$.
+
+\subsubsection{The equations of motion for the perturbations}
+\label{sec:pert eqs}
+
+For each species in our model (CDM, baryons, photons, neutrinos) the phase-space evolution is governed by a Boltzmann equation of the form
+\begin{align*}
+    \dd{f_i}{t} = C_i,
+\end{align*}
+where $f_i$ is the distribution function of species $i$\footnote{The distribution function takes the Fermi-Dirac form $f = \left[\exp\!\left(\frac{E-\mu}{k_BT}\right)+1\right]^{-1}$ for fermionic species, and the Bose-Einstein form $f = \left[\exp\!\left(\frac{E-\mu}{k_BT}\right)-1\right]^{-1}$ for bosonic species.} and $C_i$ is the collision term encoding all relevant interactions. In a cosmological context, the dominant processes are Compton scattering,
+$e^- +\gamma \rightleftharpoons e^- + \gamma,$
+and Coulomb scattering,
+$e^- + p^+ \rightleftharpoons e^- + p^+,$
+which tightly couple the photon, electron, and proton fluids at early times. Perturbing each distribution function $f_i \to \bar{f}_i + \delta f_i$ and evaluating the Boltzmann equation then yields the temporal evolution of each species.
+
+The metric perturbations in Eq.~(\ref{eq:pert metric}) enter the Einstein field equations, Eq.~(\ref{eq:GR}), from both sides simultaneously. On the left-hand side, the perturbed metric modifies the Christoffel symbols, which propagate through to perturb the Ricci tensor and ultimately the Einstein tensor, $G_{\mu\nu} \to \bar{G}_{\mu\nu} + \delta G_{\mu\nu}$. On the right-hand side, the perturbed distribution functions yield a perturbed stress-energy tensor, $T_{\mu\nu} \to \bar{T}_{\mu\nu} + \delta T_{\mu\nu}$. Matching at first order in the perturbations then gives a closed set of equations governing the evolution of the gravitational potentials $\Psi$ and $\Phi$.
+
+For CDM and baryons, the first and second moments of the perturbation equations describe the evolution of the density contrasts $\delta_{\rm CDM}$, $\delta_b$ and the bulk velocities $v_{\rm CDM}$, $v_b$ respectively. CDM is collisionless and only couples gravitationally, while baryons receive an additional momentum boost from Compton scattering off photons, encoded in the $\tau^\prime R(3\Theta_1 + v_b)$ term,
+\begin{align*}
+\delta_{\rm CDM}^\prime &= \frac{ck}{\mathcal{H}} v_{\rm CDM} - 3\Phi^\prime, \\
+v_{\rm CDM}^\prime &= -v_{\rm CDM} -\frac{ck}{\mathcal{H}} \Psi, \\
+\delta_b^\prime &= \frac{ck}{\mathcal{H}}v_b -3\Phi^\prime, \\
+v_b^\prime &= -v_b - \frac{ck}{\mathcal{H}}\Psi + \tau^\prime R(3\Theta_1 + v_b).
+\end{align*}
+Here $R = 4\Omega_{\gamma 0}/3\Omega_{b 0} a$, and the apostrophes refer to derivatives with respect to $x=\ln a$.
+
+The photon temperature perturbations are described by an infinite Boltzmann hierarchy in the multipole moments $\Theta_\ell$, where $\ell = 0, 1, 2$ correspond to the monopole (mean temperature), dipole (bulk flow) and quadrupole (anisotropic stress), respectively. Compton scattering damps higher multipoles and couples the photon dipole to the baryon velocity $v_b$. The hierarchy is truncated at $\ell = \ell_{\rm max}$ using a closure relation that minimises reflections,
+\begin{align*}
+\Theta^\prime_0 &= -\frac{ck}{\mathcal{H}} \Theta_1 - \Phi^\prime, \\
+\Theta^\prime_1 &=  \frac{ck}{3\mathcal{H}}\left[\Theta_0 - 2\Theta_2 + \Psi\right] + \tau^\prime\left[\Theta_1 + \frac{1}{3}v_b\right], \\
+\Theta^\prime_\ell &= \frac{ck}{(2\ell+1)\mathcal{H}}\left[\ell\Theta_{\ell-1} - (\ell+1)\Theta_{\ell+1}\right] + \tau^\prime\left[\Theta_\ell - \frac{1}{10}\Pi\,\delta_{\ell,2}\right] \\
+&\quad \text{for }\;2 \le \ell < \ell_{\rm max}, \\
+\Theta_{\ell}^\prime &= \frac{ck}{\mathcal{H}}\left[\Theta_{\ell-1}-\frac{\ell+1}{k\eta(x)}\Theta_\ell\right]+\tau^\prime\Theta_\ell\quad\text{for }\;
+\ell = \ell_{\rm max},
+\end{align*}
+where $\Pi \equiv \Theta_2 + \Theta_{P0} + \Theta_{P2}$ is the polarisation source term. The photon polarisation perturbations $\Theta_{P\ell}$ obey a similar hierarchy, sourced by $\Pi$ through Compton scattering,
+\begin{align*}
+\Theta^\prime_{P0} &= -\frac{ck}{\mathcal{H}}\Theta_{P1} + \tau^\prime\left[\Theta_{P0} -
+\frac{1}{2}\Pi \right], \\
+\Theta_{P\ell}^\prime &= \frac{ck}{(2\ell+1)\mathcal{H}}\left[ \ell\Theta_{P,\ell-1} - (\ell+1) \Theta_{P,\ell+1}\right] + \tau^\prime\left[\Theta_{P\ell} -
+\frac{1}{10}\Pi\,\delta_{\ell,2}\right]\\
+&\quad \text{for }\; 1 \le \ell < \ell_{\rm max}, \\
+\Theta_{P,\ell}^\prime &= \frac{ck}{\mathcal{H}}\left[\Theta_{P,\ell-1}-\frac{\ell+1}{k\eta(x)}\Theta_{P\ell}\right]+\tau^\prime\Theta_{P\ell}
+\quad \text{for }\;\ell = \ell_{\rm max}.
+\end{align*}
+Since neutrinos are collisionless after decoupling, their Boltzmann hierarchy takes the same form as the photon hierarchy but with no collision terms,
+\begin{align*}
+\mathcal{N}^\prime_0 &= -\frac{ck}{\mathcal{H}} \mathcal{N}_1 - \Phi^\prime, \\
+\mathcal{N}^\prime_1 &=  \frac{ck}{3\mathcal{H}}\left[\mathcal{N}_0 - 2\mathcal{N}_2 + \Psi\right], \\
+\mathcal{N}^\prime_\ell &= \frac{ck}{(2\ell+1)\mathcal{H}}\left[\ell\mathcal{N}_{\ell-1} - (\ell+1)\mathcal{N}_{\ell+1}\right]\quad \text{for }\; 2 \le \ell < 
+\ell_{{\rm max},\nu}, \\
+\mathcal{N}_{\ell}^\prime &= \frac{ck}{\mathcal{H}}\left[\mathcal{N}_{\ell-1}-\frac{\ell+1}{k\eta(x)}\mathcal{N}_{\ell}\right] \quad \text{for }\; \ell = \ell_{{\rm max},\nu}.
+\end{align*}
+Finally, the gravitational potentials are sourced by the total energy density and momentum of all species through the Einstein field equations. The equation for $\Phi^\prime$ is a constraint relating the time derivative of the potential to the density perturbations of all components, while $\Psi$ differs from $-\Phi$ by a term proportional to the anisotropic stress sourced by the photon and neutrino quadrupoles $\Theta_2$ and $\mathcal{N}_2$,
+\begin{align}
+\Phi^\prime &= \Psi - \frac{1}{3}\left(\frac{ck}{\mathcal{H}}\right)^2 \Phi \nonumber\\
+&\quad+ \frac{H_0^2}{2\mathcal{H}^2 a^2}\left[\Omega_{\rm CDM 0} a\delta_{\rm CDM} + \Omega_{b 0} a\delta_b + 4\Omega_{\gamma 0} \Theta_0 + 4\Omega_{\nu 0}\mathcal{N}_0\right],\nonumber \\[2mm]
+\Psi &= -\Phi - \frac{12H_0^2}{c^2k^2a^2}\left[\Omega_{\gamma 0}\Theta_2 + \Omega_{\nu 0}\mathcal{N}_2\right].\label{eq:Psi}
+\end{align}
+
+\subsubsection{Initial conditions from inflation}
+The system is initialized sufficiently deep in the radiation-dominated era such that we can assume that all modes of interest are superhorizon ($ck \ll \mathcal{H}$). The adiabatic initial conditions derived from inflationary models are
+
+\begin{align*}
+\Psi &= -\frac{1}{\dfrac{3}{2} + \dfrac{2f_\nu}{5}}, \\
+\Phi &= -\left(1+\frac{2f_\nu}{5}\right)\Psi, \\
+\delta_{\rm CDM} = \delta_b &= -\frac{3}{2}\,\Psi, \\
+v_{\rm CDM} = v_b &= -\frac{ck}{2\mathcal{H}}\,\Psi,\hspace{30mm}
+\end{align*}
+where $f_\nu = \Omega_{\nu0}/\Omega_{R0}$.
+
+For the photon multipoles,
+\begin{align*}
+\Theta_0 &= -\frac{1}{2}\Psi, \\
+\Theta_1 &= \frac{ck}{6\mathcal{H}}\Psi, \\
+\Theta_2 &= \begin{cases}
+-\dfrac{8ck}{15\mathcal{H}\tau'}\,\Theta_1 & \text{(with polarisation),} \\[6pt]
+-\dfrac{20ck}{45\mathcal{H}\tau'}\,\Theta_1 & \text{(without polarisation),}
+\end{cases}\\
+\Theta_\ell &= -\frac{\ell}{2\ell+1}\frac{ck}{\mathcal{H}\tau'}\,\Theta_{\ell-1}, \qquad \ell \geq 3.
+\end{align*}
+
+For the photon polarisation multipoles,
+\begin{align*}
+\Theta_0^P &= \frac{5}{4}\,\Theta_2, \\
+\Theta_1^P &= -\frac{ck}{4\mathcal{H}\tau'}\,\Theta_2, \\
+\Theta_2^P &= \frac{1}{4}\,\Theta_2, \\
+\Theta_\ell^P &= -\frac{\ell}{2\ell+1}\frac{ck}{\mathcal{H}\tau'}\,\Theta_{\ell-1}^P, \qquad \ell \geq 3.
+\end{align*}
+
+For the neutrino multipoles,
+\begin{align*}
+\mathcal{N}_0 &= -\frac{1}{2}\Psi, \\
+\mathcal{N}_1 &= \frac{ck}{6\mathcal{H}}\Psi, \\
+\mathcal{N}_2 &= -\frac{c^2k^2a^2(\Phi+\Psi)}{12H_0^2\,\Omega_{\nu 0}}, \\
+\mathcal{N}_\ell &= \frac{ck}{(2\ell+1)\mathcal{H}}\,\mathcal{N}_{\ell-1}, \qquad \ell \geq 3.
+\end{align*}
 
 \subsection{Implementation details}
-Something about the numerical work.
+\subsubsection{Tight coupling regime}
+
+Before photon decoupling, Thomson scattering couples the photon and baryon fluids so strongly that integrating the full ODE system becomes stiff and numerically unstable. We therefore adopt a \emph{tight-coupling approximation}, in which the Boltzmann hierarchy for photons is truncated to only the monopole $\Theta_0$ and dipole $\Theta_1$ as independent degrees of freedom. All higher multipoles are depend on these via
+\begin{align*}
+    \Theta_\ell \approx -\frac{\ell}{2\ell+1}\frac{ck}{\mathcal{H}\tau'}\Theta_{\ell-1}, \qquad \ell \geq 2,
+\end{align*}
+and photon polarisation is neglected entirely. The evolution equations for $\Theta_1$ and $v_b$ are also modified: rather than integrating the full expressions, one instead solves a combined photon--baryon momentum equation in which the tight-coupling limit is taken analytically before being passed to the integrator \citep{winther_milestone3},
+
+\begin{align*}
+q &= \frac{-[(1-R)\tau^\prime + (1+R)\tau^{\prime\prime}](3\Theta_1+v_b)}{(1+R)\tau^\prime + \frac{\mathcal{H}^\prime}{\mathcal{H}} -1}\\
+&\quad\quad+\frac{-\frac{ck}{\mathcal{H}}\Psi + (1-\frac{\mathcal{H}^\prime}{\mathcal{H}})\frac{ck}{\mathcal{H}}(-\Theta_0 +2\Theta_2) - \frac{ck}{\mathcal{H}}\Theta_0^\prime}{(1+R)\tau^\prime + \frac{\mathcal{H}^\prime}{\mathcal{H}} -1},
+\end{align*}
+such that
+\begin{align*}
+v_b^\prime &= \frac{1}{1+R} \left[-v_b - \frac{ck}{\mathcal{H}}\Psi + R(q +
+\frac{ck}{\mathcal{H}}(-\Theta_0 + 2\Theta_2) - \frac{ck}{\mathcal{H}}\Psi)\right],\\
+\Theta^\prime_1 &= \frac{1}{3} (q - v_b^\prime).
+\end{align*}
+
+The expressions for the higher-ordered photon moments are the same in the tight-coupling regime as given by the initial conditions
+\begin{align*}
+\Theta_2 &= \left\{
+\begin{array}{l}
+-\frac{8ck}{15\mathcal{H}\tau^\prime} \Theta_1, \quad\quad \textrm{(with polarisation)} \\[2mm]
+-\frac{20ck}{45\mathcal{H}\tau^\prime} \Theta_1, \quad\quad \textrm{(without polarisation)}
+\end{array}\right. \\ 
+\Theta_\ell &= -\frac{\ell}{2\ell+1} \frac{ck}{\mathcal{H}\tau'} \Theta_{\ell-1}, \quad\quad \ell > 2\\
+\Theta_0^P &= \frac{5}{4}\Theta_2 \\
+\Theta_1^P &= -\frac{ck}{4\mathcal{H}\tau'}\Theta_2 \\
+\Theta_2^P &= \frac{1}{4}\Theta_2 \\
+\Theta_\ell^P &= -\frac{\ell}{2\ell+1} \frac{ck}{\mathcal{H}\tau'} \Theta_{\ell-1}^P, \quad\quad \ell > 2. 
+\end{align*}
+
+We impose two criteria for the tight-coupling regime to hold. First, the scattering rate must be large compared to the expansion rate and the oscillation wavenumber,
+\begin{align*}
+    \left|\frac{\mathrm{d}\tau}{\mathrm{d}x}\right| > 10\min\!\left(1,\,\frac{ck}{\mathcal{H}}\right).
+\end{align*}
+Second, we must be prior to the onset of recombination, which we take to occur at $x = -8.3$, so the approximation is applied only for $x < -8.3$.
+
+
+\subsubsection{Boltzmann hierarchy cutoff}
+\label{sec:cutoff}
+
+As discussed in Section~\ref{sec:pert eqs}, we truncate the photon, photon polarisation, and neutrino hierarchies at $\ell_\text{max}$ and $\ell_{\text{max},\nu}$ respectively. Although the CMB power spectrum eventually requires multipoles up to $\ell \sim 2000$, these high-$\ell$ moments need not be obtained from the ODE system directly: they are instead recovered via the \textit{line-of-sight} integral (discussed in Section~\ref{sec:LOS}), which requires only $\Pi$, $\Phi$, $\Psi$, $\Theta_0$, and $v_b$. The highest multipole that must therefore be resolved accurately by the ODE solver is $\Theta_2$, which enters the source term through $\Pi$. We therefore set $\ell_{\text{max}} = \ell_{\text{max},\nu} = 8$, which is sufficient to ensure that all quantities entering the LOS integral are computed to adequate accuracy.
 
 \subsection{Results}
+\subsubsection{Matter perturbations and the Baryon Acoustic Oscillations}
 
-\begin{figure*}
+\begin{figure*}[h!]
       \centering
       \includegraphics[width=0.99\linewidth]{../figures/matter_pert.pdf}
+      \caption{(a) the photon and neutrino monopoles (density contrast), (b) the density contrast of CDM and baryons, (c) the dipole moments (bulk velocity) of the photon and neutrino perturbations, and (d) the bulk velocities of CDM and baryons, all as functions of the log-scale factor $x$. The colour of the lines indicate the perturbation scale $k$; blue is the smallest scale, orange in the middle, and red is the largest scale. The vertical dotted lines correspond to the time of horizon entry of the given pertubation scale $k$ associated with the colour, i.e. $x_\text{HE}(k)$ s.t. $k\sim \mathcal{H}(x_\text{HE})/c$.}
+      \label{fig:4x4 perturbations}
 \end{figure*}
+\begin{figure}[h!]
+      \centering
+      \includegraphics[width=0.99\linewidth]{../figures/photon_baryon_coupling.pdf}
+      \caption{The temporal evolution of the photon and baryon density contrasts, $\delta_\gamma$ and $\delta_b$, at wavenumber $k=0.1/\mbox{Mpc}$. Between horizon entry (HE) and recombination (Rec.), indicated with vertical dotted lines, the perturbations oscillate together in a photon-baryon plasma tightly coupled by Thomson scattering.}
+      \label{fig:photon-baryon plasma}
+\end{figure}
+
+Figure~\ref{fig:4x4 perturbations} shows the matter perturbations as functions of the log-scale factor $x$ and wavenumber $k$. A feature common to all panels is that perturbations remain frozen at their inflationary initial values until the mode enters the horizon at $k \sim \mathcal{H}/c$: superhorizon modes ($k \ll \mathcal{H}/c$) are causally disconnected and cannot evolve, whereas subhorizon modes ($k \gg \mathcal{H}/c$) are free to collapse and oscillate.
+
+Panel (a) displays the photon density contrast $\delta_\gamma = 4\Theta_0$ along with the neutrino denisty contrast $\delta_\nu = 4\mathcal{N}_0$. Upon horizon entry, radiation pressure resists gravitational collapse and drives acoustic oscillations. At small scales the perturbations are damped by photon diffusion and decay over time, while at larger scales which enter the horizon closer to matter--radiation equality, the growing gravitional potential wells boost to the amplitude before the perturbations begin to oscillate. The bulk velocity perturbations $v_\gamma = -3\Theta_1$ and $v_\nu = -3\mathcal{N}_1$, shown in panel (c), mirrors the oscillatory behaviour of the density contrasts, with decaying amplitude over time.
+
+The CDM and baryon density contrasts $\delta_\text{CDM}$ and $\delta_b$ are displayed in panel (b), and their associated bulk velocities $v_\text{CDM}$ and $v_b$ are shown in panel (d). After entering the horizon, the CDM collapses under gravity without any opposing pressure and forms so-called \textit{dark matter halos} that grow as $\delta \propto \ln a = x$ in the radiation era and $\delta \propto a = e^x$ in the matter era \citep{Meszaros}.  The earlier the mode enters the horizon, the more time it has to grow, which is why we observe that the smaller scale perturbations reach the highest density contrasts of $\delta_{\text{CDM}} \sim 10^4$.
+
+Baryon perturbations that enter the horizon before recombination ($x_\text{HE} < x_\text{rec}$) initially begin to collapse under gravity, just as CDM does. However, since the baryons remain strongly coupled to the photons at this epoch, radiation pressure counteracts the gravitational infall and the two fluids oscillate together as a single photon-baryon plasma. These are the \textit{baryon acoustic oscillations} (BAO), visible in panel (b) as oscillations between horizon entry and recombination for the smallest scale. The tight coupling between the photon and baryon fluids driving these oscillations is illustrated more clearly in Figure~\ref{fig:photon-baryon plasma}, where the two density contrasts are plotted together for $k = 0.1\,\text{Mpc}^{-1}$. Upon decoupling, the baryons are released from radiation pressure and fall freely into the gravitational potential wells already set up by the collapsing CDM. The baryon density contrast then grows rapidly to catch up with that of the CDM, and the two track each other closely thereafter. Panel (b) therefore illustrates the necessity of CDM for structure formation: without the DM halos set up prior to recombination, the baryons at smaller scales could not have grown to the density contrasts observed today within the age of the Universe.\\
+
+\subsubsection{Metric perturbations and anisotropies sourced by neutrino and photon quadrupoles}
+
 \begin{figure}
       \centering
       \includegraphics[width=0.99\linewidth]{../figures/phi_psi_pert.pdf}
+      \caption{Evolution of the scalar metric perturbations $\Phi$ and $\Psi$, and the anisotropic stress $\Phi+\Psi$. After the horizon entry of the perturbation modes (indicated by vertical dotted lines), the anisoptropic stress quickly decays and goes to zero.}
+      \label{fig:phi psi}
 \end{figure}
+
+\begin{figure}[h!]
+      \centering
+      \includegraphics[width=0.99\linewidth]{../figures/quadrupoles.pdf}
+      \caption{The photon and neutrino quadrupole moments as functions of the log-scale factor $x$. The colour of the lines represent the perturbation scales.}
+      \label{fig:quadrupoles}
+\end{figure}
+
+The quadrupoles $\Theta_2/a^2$ and $\mathcal{N}_2/a^2$ are shown in Figure~\ref{fig:quadrupoles}. Both are non-zero on superhorizon scales, consistent with the adiabatic initial conditions from inflation, and both begin evolving after horizon entry. However, the neutrino quadrupole grows faster and to much larger amplitude, since it is decoupled and free-streaming in the early Universe, unimpeded by scattering. Thomson scattering in the photon-baryon plasma continuously suppresses $\Theta_2$, keeping it small until recombination, after which it grows sharply as the mean free path increases. At late times $\Theta_2/a^2$ and $\mathcal{N}_2/a^2$ both decay to zero and are diluted by cosmic expansion.
+
+Figure~\ref{fig:phi psi} displays the evolution of the scalar metric perturbations $\Phi$ and $\Psi$, as well as the anisotropic stress $\Phi + \Psi$. On superhorizon scales the two potentials are nearly equal and opposite, so $\Phi + \Psi$ is small but non-zero. Even before horizon entry, the free-streaming neutrinos carry a considerable non-zero quadrupole $\mathcal{N}_2$, as seen in Figure \ref{fig:quadrupoles}, which sources a small anisotropic stress through Eq.(\ref{eq:Psi}). After horizon entry, radiation pressure prevents the potentials from being sustained and they begin to decay and oscillate. As matter starts to dominate and the neutrino and photon quadrupoles are diluted, the anisotropic stress decays and $\Phi \approx -\Psi$ is restored at around $x\sim 2.5$.
+
+
+\subsubsection{Photon polarisation perturbations}
 \begin{figure}
       \centering
       \includegraphics[width=0.99\linewidth]{../figures/polarization_pert.pdf}
+      \caption{The evolution of the first three photon polarisation multipoles ($\ell=0,1,2$). Smaller-scale polarisation perturbations are sourced around the time of recombination (vertical black dotted line), while the largest scales are mostly unfazed. All the polarisation perturbations decay to zero in the late Universe.}
+      \label{fig:polarisation}
 \end{figure}
 
-\section{Milestone IV}
+The polarisation multipoles $\Theta^P_0$, $\Theta^P_1$, and $\Theta^P_2$, seen in Figure \ref{fig:polarisation}, are completely suppressed before recombination, as frequent Thomson scatterings continuously isotropise the photon distribution. Around recombination, all modes grow sharply as the mean free path increases and scattering becomes inefficient, so polarisation is sourced during this transition. Smaller-$k$ modes are effectively unfazed by the perturbations sourced during recombination since the polarisation perturbations have not had enough time to propagate to such large scales. Larger-$k$ modes develop larger amplitudes and oscillate more rapidly, and the amplitude decreases with increasing $\ell$ as power is suppressed higher up in the multipole hierarchy. After recombination is completed the oscillations decay and all multipoles tend to zero for all $k$-modes. The polarisation perturbations present therefore a minor correction to the overall power spectrum, and the effect is mostly visible at small scales (large $k$). 
+
+
+
+\section{CMB and matter power spectra}
 Some introduction about what it is all about.
+\td{INTRODUCTION}
 
 \subsection{Theory}
-The theory behind this milestone.
+\td{Intro}
+
+\subsubsection{CMB power spectrum}
+To get the CMB power spectrum from the perturbations we evolved in the previous section, we must decompose the CMB temperature field into an expansion in spherical harmonics (SH)
+\begin{equation*}
+      T(\hat{\vec{n}}) = \sum_{\ell m} a_{\ell m} Y_{\ell m}(\hat{\vec{n}}),
+\end{equation*}
+where $\hat{\vec{n}}$ is the direction on the sky, $a_{\ell m}$ are the spherical harmonic coefficients, and $Y_{\ell m}$ are the spherical harmonics. From the $a_{\ell m}$ coefficients we can evaluate the expectation value of their squares to get the CMB power spectrum
+\begin{equation}
+      C_\ell \equiv \Big\langle \hspace{0.5mm}{|a_{\ell m}|^2}\Big\rangle  =  \langle a_{\ell m}a_{\ell m}^*\rangle.
+      \label{eq:C_ell definition}
+\end{equation}
+It can be shown that the SH coefficients in terms of $\Theta$ are given by the integral
+\begin{align*}
+      a_{\ell m}(\vec{x},t) = \int d\Omega_{\hat{\vec{p}}} Y_{\ell m}^*(\hat{\vec{p}})\Theta(\vec{x},\hat{\vec{p}},t).
+\end{align*}
+We can then then plug in the expansion of $\Theta$ in multipoles of the Legendre polynomials (see Eq.(\ref{eq:theta expansion})) and evaluate Eq.(\ref{eq:C_ell definition}). This yields a rather messy integral that fortunately can be massaged into a more workable form
+\begin{align*}
+      C_\ell = \frac{2}{\pi}\int k^2\mathcal{P}_{\rm prim.}(k) \Theta_\ell^2(k)dk.
+\end{align*}
+Here $\Theta_\ell$ are the photon multipoles and $\mathcal{P}_\text{prim.}(k)$ is the \textit{primordial power spectrum}, which most inflation models predict to be a Harrison-Zel'dovich spectrum, given by
+\begin{align*}
+      \frac{k^3}{2\pi^2} \mathcal{P}_{\rm prim.}(k) = A_s \left(\frac{k}{k_{\rm pivot}}\right)^{n_s-1},
+\end{align*}
+with $k_\text{pivot}=0.05/\mbox{Mpc}$ is some wavenumber that yields a power spectrum amplitude $A_s\sim 2\times 10^{-9}$, and $n_s\sim 0.96$ is the so-called \textit{spectral index} of scalar perturbations. We therefore end up with the final expression for the CMB power spectrum
+\begin{align}
+      C_\ell = 4\pi \int_0^{\infty} A_s \left(\frac{k}{k_{\rm pivot}}\right)^{n_s-1}\!\! \Theta_\ell^2(k) \frac{dk}{k},\label{eq:cell}
+\end{align}
+which is the one we evaluate numerically from the perturbations we simulated in the previous section.
+
+
+
+\subsubsection{Line-of-sight integral}
+\label{sec:LOS}
+For us to compare our model to observational data, we need to evaluate the CMB power spectrum, Eq.(\ref{eq:cell}), up to $\ell\sim2000$, which requires knowing $\Theta_\ell$ up to this order. As discussed in Section \ref{sec:cutoff}, we do not evaluate the multipoles directly in the ODE solver up to such high orders, since this would mean integrating thousands of coupled ODEs and would be computationally exhaustive. We instead solve the system up to $\ell_\text{max}=8$ to ensure the first few multipoles are accurate, and then recover the higher-order multipoles using the line-of-sight (LOS) integral. This method was developed by Seljak and Zaldarriaga \citep{LOS_integration} and allows us to evaluate the multipoles to much higher order using only the first few. Starting from the perturbed Boltzmann equation for photons,
+\begin{align*}
+      &\frac{\partial \Theta}{\partial t} + \frac{ik\mu}{a} \Theta + \left(\frac{\partial \Phi}{\partial t} + \frac{i k\mu}{a}\Psi\right) \\
+      &\quad\quad= n_e \sigma_T\left[\Theta_0 - \Theta + i\mu v_b - \frac{3\mu^2-1}{4}\Pi\right],
+\end{align*}
+one can derive the LOS integral giving the present-day photon multipoles \citep{winther_lectures},
+\begin{equation*}
+      \Theta_\ell(k, x=0) = \int_{-\infty}^{0} \tilde{S}(k,x) j_\ell[k(\eta_0-\eta)] \d x.
+\end{equation*}
+Here $j_\ell$ are the spherical Bessel functions (see Appendix \ref{appendix:legendre}), and $\tilde{S}$ is the source function, given by
+\begin{align*}
+      \tilde{S}(k,x) &= \tilde{g}\left[ \Theta_0 + \Psi + \frac{1}{4}\Pi\right] + e^{-\tau} \left[\Psi^\prime-\Phi^\prime\right] \\ 
+      &-\frac{1}{ck}\dd{}{x}(\mathcal{H}\tilde{g}v_b) + \frac{3}{4c^2k^2} \dd{}{x}
+\left[\mathcal{H}\dd{}{x} (\mathcal{H}\tilde{g}\Pi)\right].
+\end{align*}
+The first term in $\tilde{S}$ is the Sachs-Wolfe (SW) effect, arising from the uneven gravitational redshift of CMB photons at the surface of last scattering. The second is the integrated Sachs-Wolfe (ISW) term, which accounts for photons gaining or losing energy as they traverse decaying or growing potential wells along the line of sight. The third is the Doppler term, sourced by the bulk velocity of the photon-baryon plasma at last scattering. The last term is sourced by the polarisation potential $\Pi$, and is aptly referred to as the polarisation term.
+
+The E-mode polarisation source function is given by
+\begin{align*}
+      S_E(k,x) = \frac{3\tilde{g}\Pi}{4k^2(\eta_0-\eta)^2},
+\end{align*}
+which we use to evaluate the LOS integral and obtain $\Theta^E_{\ell}(k,x=0)$, needed for computing the E-mode polarisation and cross power spectra $C_\ell^{EE}$ and $C_\ell^{TE}$.
+
+\subsubsection{Matter power spectrum}
+Another observable quantity we can calculate is the matter power spectrum given by
+\begin{align*}
+      \mathcal{P}(k,x) = |\Delta_M(k,x)|^2\mathcal{P}_{\rm prim.}(k),
+\end{align*}
+where we define
+\begin{align*}
+      \Delta_M(k,x) \equiv \frac{2}{3}\left(\frac{ck}{H_0}\right)^2 \frac{\Phi(k,x)}{\Omega_{M0}a^{-1}}.
+\end{align*}
+The matter power spectrum $\mathcal{P}(k,x)$ is a measure of the amplitude of density perturbations as a function of scale. It is defined through the two-point correlation of the density contrast $\delta(\vec{k})$, and a larger $\mathcal{P}(k,x)$ at a given $k$ indicates stronger clustering on that scale compared to a smooth density field.
 
 \subsection{Implementation details}
-Something about the numerical work.
+
+\subsubsection{Numerical LOS integration}
+%%%
+% BESSEL: sample linearly from 0 to kmax*eta0, dz = pi/8
+% LOS:    linearly spaced dk = pi/4eta0, kmin=5e-5, kmax=1.0, nx=700.
+%%%
+The most computationally demanding step after solving the perturbation equations is the LOS integration. We therefore evaluate $\Theta_\ell$ at 63 semi-evenly spaced multipoles up to $\ell=2000$, listed in Table~\ref{tab:ell_values}, and spline the resulting power spectrum to obtain $C_\ell$ at all intermediate values.
+
+To speed up the integration, we precompute splines of the spherical Bessel functions at each required $\ell$ rather than calling the GSL library at every integration step. The Bessel functions are sampled at linearly spaced arguments $y = k(\eta_0 - \eta)$ from zero to $y = k_\text{max}\eta_0$ with a spacing of $\Delta y = \pi/8$, so that each period is sampled by 16 points and the rapid oscillations are accurately captured by the cubic spline.
+
+The LOS integral is then evaluated using trapezoidal integration from $x_\text{start} = \ln(10^{-8}) \simeq -18.42$ to $x_\text{end} = 0$ for wavenumbers in the range $k_\text{min} = 5\times10^{-5}\,\text{Mpc}^{-1}$ to $k_\text{max} = 1.0\,\text{Mpc}^{-1}$. For each $k$, The LOS integral is evaluated numerically using the trapezoidal rule,
+\begin{equation*}
+      \Theta_\ell(k) = \sum_{i=1}^{N_x} \tilde{S}(x_i, k)\, j_\ell[k(\eta_0 - \eta(x_i))]\Delta x,
+\end{equation*}
+where $\Delta x = |x_\text{end}-x_\text{start}|/(N_x-1)$ is the uniform spacing in $x$ and $N_x=700$. The wavenumbers are sampled linearly with a resolution of $\Delta k=\pi/4\eta_0$. 
+
+We follow the same LOS integration procedure for calculating the E-mode polarisation multipoles $\Theta_\ell^E$, only replacing $\tilde{S}$ with $S_E$.
+
+
+
+
+\subsubsection{Producing the CMB power spectrum and map}
+%%%
+% CELL: log spaced k, dlogk = pi/32keta0
+%%%
+Having solved for the $\Theta_\ell$ and $\Theta_\ell^E$ multipoles, we are now in the place to perform the integral in Eq.(\ref{eq:cell}) and solve for the CMB power spectrum $C_\ell$, as well as the cross and polarisation power spectra; $C_\ell^{TE}$ and $C_\ell^{EE}$. This is done through the trapezoidal integral method, just as we did for the LOS integrals, sampling log-spaced $k$-values with resolution $\Delta(\ln k)=\pi/32k\eta_0$,
+
+\begin{equation*}
+      C_\ell = 4\pi \sum_{i=1}^{N_k} \mathcal{P}_\text{prim.}(k_i)\Theta_\ell^2(k_i)\Delta(\ln k),
+\end{equation*}
+where $k_1 = k_\text{min}$, $k_{N_k}=k_\text{max}$, and $$N_k =\frac{\ln(k_\text{max})-\ln(k_\text{min})}{\Delta(\ln k)}.$$ The same is done for $C_\ell^{TE}$ and $C_\ell^{EE}$, replacing one or both of the $\Theta_\ell$-factors in the integrand by $\Theta_\ell^E$. Then finally we spline the power spectra to get the values in between the $\ell$-values listed in Table \ref{tab:ell_values}.
+
+In order to qualitatively compare our simulated CMB with observations, we produce the simulated CMB map using the Python library \verb|healpy| \citep{healpy1,healpy2} from the computed power spectrum $C_\ell$.
 
 \subsection{Results}
 \begin{figure}
       \centering
-      \includegraphics[width=0.99\linewidth]{../figures/matter_power_spectrum.pdf}
-\end{figure}
-\begin{figure}
-      \centering
-      \includegraphics[width=0.99\linewidth]{../figures/CMB_power_spectrum.pdf}
-\end{figure}
-\begin{figure}
-      \centering
       \includegraphics[width=0.99\linewidth]{../figures/transfer_funcsT.pdf}
+      \caption{(a) The transfer functions $\Theta_\ell$ for six different $\ell$, and (b) the power passed to the integrand of $C_\ell$ for the same six multipoles $\ell$.}
+      \label{fig:transfer funcs}
 \end{figure}
 \begin{figure}
       \centering
-      \includegraphics[width=0.99\linewidth]{../figures/transfer_funcsE.pdf}
-\end{figure}
-\begin{figure}
-      \centering
-      \includegraphics[width=0.99\linewidth]{../figures/polarisation_spectra.pdf}
+      \includegraphics[width=0.99\linewidth]{../figures/matter_power_spectrum.pdf}
+      \caption{The simulated theoretical current day matter power spectrum $\mathcal{P}(k, x=0)$ along with observations from WMAP + ACT of the CMB; SDSS galaxy survey (DR7 LRG); and Ly$\alpha$ forest (BOSS). The vertical dashed line marks the location of the equality scale $k_\text{eq}\equiv \mathcal{H}(x_\text{eq}^{MR})/c$.}
+      \label{fig:matter PS}
 \end{figure}
 \begin{figure*}
       \centering
-      \includegraphics[width=0.7\linewidth]{../figures/simulated_CMB_map.pdf}
+      \includegraphics[width=0.85\linewidth]{../figures/CMB_power_spectrum.pdf}
+      \caption{The top panel shows the power spectra for the theoretical CMB and a simplified model (for which there is no helium nor neutrinos, and reionisation and polarisation has been turned off) together with observational data from Planck 2018 \citep{planck2020}. The lower panel breaks down the total power spectrum displaying the power spectra resulting from turning on each of the four terms in the source function $\tilde{S}$ separately while the others are turned off; Sachs-Wolfe (SW), integrated Sachs-Wolfe (ISW), Doppler, and polarisation (POL).}
+      \label{fig:CMB PS}
 \end{figure*}
-\begin{figure}
+\begin{figure*}
       \centering
-      \includegraphics[width=0.7\linewidth]{../figures/source_funcs.pdf}
-\end{figure}
+      \includegraphics[width=0.8\linewidth]{../figures/polarisation_spectra.pdf}
+      \caption{The cross power spectrum $C_\ell^{TE}$ and the E-mode polarisation power spectrum $C_\ell^{EE}$ plotted against observational data from Planck 2018 \citep{planck2020}.}
+      \label{fig:polarisation PS}
+\end{figure*}
+\begin{figure*}
+      \centering
+      \includegraphics[width=0.7\linewidth]{../figures/simulated_CMB_map.pdf}
+      \caption{CMB map produced from the simulated power spectrum. Generated using the Python library \texttt{healpy} \citep{healpy1,healpy2}.}
+      \label{fig:CMB map sim}
+\end{figure*}
+
+\subsubsection{Transfer functions}
+The temperature transfer functions $\Theta_\ell$ are shown in Figure~\ref{fig:transfer funcs}. Panel (a) displays the transfer functions $\sqrt{\ell(\ell+1)}\,\Theta_\ell$ as a function of $k\eta_0$, and a clear feature is that each multipole is localised around $k\eta_0 \sim \ell$, which follows directly from the spherical Bessel functions $j_\ell[k(\eta_0-\eta)]$ peaking near their argument: each multipole $\ell$ is therefore sensitive to a characteristic physical scale. The oscillations within each transfer function reflects the acoustic oscillations in the photon-baryon plasma, with the number of oscillations increasing with $\ell$, and the amplitude decreasing at large $\ell$ due to diffusion damping (Silk damping).
+
+Panel (b) shows the power $\ell(\ell+1)|\Theta_\ell|^2/k$, where the peaks shift to larger $k\eta_0$ with increasing $\ell$, consistent with the $k\eta_0\sim\ell$ scaling. The overall envelope decays at large $k\eta_0$ due to the exponential suppression from diffusion damping. The low-$\ell$ modes are an exception: these correspond to large angular scales that never entered the horizon during radiation domination and are therefore unaffected by acoustic oscillations and diffusion damping. 
+
+
+\subsubsection{Matter power spectrum}
+The current day matter power spectrum $\mathcal{P}(k)$ derived from our model is shown in Figure~\ref{fig:matter PS}, alongside observational data from three independent probes: CMB lensing (WMAP + ACT), galaxy clustering (SDSS DR7 LRG), and the Ly$\alpha$ forest (BOSS). The theoretical prediction is in excellent agreement with all three datasets.
+
+The spectrum rises toward a peak near $k_\text{eq}\equiv \mathcal{H}(x_\text{eq}^{MR})/c$, the wavenumber corresponding to the mode that entered the horizon at matter-radiation equality, and falls off as a power law on either side of this turnover scale. Modes with $k < k_\text{eq}$ entered the horizon during matter domination and after recombination, such that they grew virtually unimpeded by the radiation pressure, preserving the near scale-invariant primordial spectrum $\mathcal{P}_\text{prim.}(k) \propto k^{n_s}$ on large scales. Modes with $k > k_\text{eq}$ entered the horizon during radiation domination, when radiation pressure prevented gravitational collapse and the growth of the CDM perturbations was logarithmically suppressed, the so-called Meszaros effect \citep{Meszaros}. This suppression causes the characteristic turnover and the subsequent power-law decay at small scales. At the largest scales the Ly$\alpha$ and SDSS data overlap well with each other and with the theory, as shown in the inset, confirming that the model captures the correct shape of the power spectrum across a wide range of physical scales.
+
+\subsubsection{CMB and polarisation power spectra}
+
+
 
 \section{Conclusions}
 
 I will write a short summary and conclusion in the end.
 
 \begin{acknowledgements}
-      Thank you to Hans A. Winther for brilliant lectures and help with the project.
+      Thank you to Hans A. Winther for brilliant lectures and help with the project, and to Petter Callin for writing a great guide for how to carry out a project like this.
 \end{acknowledgements}
 
 \bibliographystyle{aa}
@@ -801,6 +1130,71 @@ At late times, the radiation density parameter can be neglected, so we end up wi
 \begin{align*}
       x_\text{acc} \equiv \ln a_\text{acc} = \frac{1}{3}\ln\bigg(\frac{\Omega_{M0}}{2\Omega_{\Lambda 0}}\bigg)\;.
 \end{align*}
+
+\section{Legendre polynomials and spherical Bessel functions}
+\label{appendix:legendre}
+The Legendre polynomials $P_\ell(\mu)$ are functions of $\mu = \cos\theta$, where $\theta$ is the angle between two vectors. They arise naturally in problems with spherical symmetry, such as expansions of gravitational or electrostatic potentials. The first four are
+\begin{align*}
+      P_0(\mu) &= 1, \\
+      P_1(\mu) &= \mu,\\
+      P_2(\mu) &= \frac{3\mu^2-1}{2},\\
+      P_3(\mu) &= \frac{5\mu^3-3\mu}{2},
+\end{align*}
+and all higher-order polynomials can be generated via Bonnet's recursion formula,
+\begin{equation*}
+      \mu P_\ell(\mu) = \frac{\ell+1}{2\ell+1}P_{\ell+1}(\mu) + \frac{\ell}{2\ell+1}P_{\ell-1}(\mu).
+\end{equation*}
+The set $\{P_\ell\}_{\ell=0}^\infty$ forms an orthogonal basis for the space of square-integrable functions on $[-1,1]$, with the orthogonality relation
+\begin{equation*}
+      \int_{-1}^1P_\ell(\mu)P_{\ell'}(\mu)\,\d \mu = \frac{2}{2\ell+1}\delta_{\ell\ell'}.
+\end{equation*}
+For our interest, this means that any sufficiently well-behaved function $f$ can therefore be uniquely decomposed as a multipole expansion,
+\begin{equation*}
+      f\!\left(\mu;\{x_i\}_{i=1}^N\right) = \sum_{\ell=0}^{\infty}\frac{2\ell + 1}{i^\ell}f_\ell\!\left(\{x_i\}_{i=1}^N\right)P_\ell(\mu),
+\end{equation*}
+where the multipole coefficients are extracted via the orthogonality relation,
+\begin{equation*}
+      f_\ell\!\left(\{x_i\}_{i=1}^N\right) \equiv \frac{i^\ell}{2}\int_{-1}^1 P_\ell(\mu)\, f\!\left(\mu;\{x_i\}_{i=1}^N\right)\d \mu.
+\end{equation*}
+
+The spherical Bessel functions $j_\ell(x)$ are the radial counterparts to the Legendre polynomials: while the $P_\ell$'s describe the angular dependence of a system, the $j_\ell$'s encode the radial dependence. The first few are
+\begin{align*}
+      j_0(x) &= \frac{\sin x}{x},\\
+      j_1(x) &= \frac{\sin x}{x^2} - \frac{\cos x}{x},\\
+      j_2(x) &= \left(\frac{3}{x^3} - \frac{1}{x}\right)\sin x - \frac{3\cos x}{x^2},
+\end{align*}
+and higher orders follow from the recursion relation
+\begin{equation*}
+      j_{\ell+1}(x) = \frac{2\ell+1}{x}\,j_\ell(x) - j_{\ell-1}(x).
+\end{equation*}
+A key identity linking the Bessel functions and the Legendre polynomials is the plane-wave expansion,
+\begin{equation*}
+      e^{i\mathbf{k}\cdot\mathbf{r}} = \sum_{\ell=0}^{\infty} i^\ell (2\ell+1)\,j_\ell(kr)\,P_\ell(\hat{k}\cdot\hat{r}),
+\end{equation*}
+which decomposes a plane wave into spherical waves of definite angular momentum $\ell$, and explains the appearance of the $i^\ell$ factor in the multipole expansion above.
+
+\section{$\ell$-values}
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{*{7}{l}}
+\hline\hline
+\multicolumn{7}{c}{Evaluated $\ell$-values}\\
+\hline
+2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+10 & 12 & 15 & 20 & 25 & 30 & 40 \\
+50 & 60 & 70 & 80 & 90 & 100 & 120 \\
+140 & 160 & 180 & 200 & 225 & 250 & 275 \\
+300 & 350 & 400 & 450 & 500 & 550 & 600 \\
+650 & 700 & 750 & 800 & 850 & 900 & 950 \\
+1000 & 1050 & 1100 & 1150 & 1200 & 1250 & 1300 \\
+1350 & 1400 & 1450 & 1500 & 1550 & 1600 & 1650 \\
+1700 & 1750 & 1800 & 1850 & 1900 & 1950 & 2000 \\
+\hline\hline\\
+\end{tabular}
+\caption{The 63 $\ell$-values used in the evaluation of the CMB power spectra.}
+\label{tab:ell_values}
+\end{table}
 \end{appendix}
 
 \end{document}

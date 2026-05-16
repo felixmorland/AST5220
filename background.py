@@ -6,10 +6,24 @@ from matplotlib.lines import Line2D
 from scipy.spatial import ConvexHull
 from matplotlib.ticker import LogLocator
 
-# COLORS
-cblue = "#476CFF"
-cred = "#DE4E61"
-cgreen = "#32A639" 
+# Planck-like colormap
+from matplotlib.colors import ListedColormap
+colombi1_cmap = ListedColormap(np.loadtxt("Planck_Parchment_RGB.txt")/255.)
+colombi1_cmap.set_bad("gray") # color of missing pixels
+colombi1_cmap.set_under("white") 
+cmap = colombi1_cmap
+
+planck_colors = [cmap(i) for i in np.linspace(0,1,100)]
+col = {
+    'dark blue'     : planck_colors[0],
+    'blue'          : planck_colors[10],
+    'light blue'    : planck_colors[25],
+    'beige'         : planck_colors[50],
+    'yellow'        : planck_colors[60],
+    'orange'        : planck_colors[68],
+    'red'           : planck_colors[88],
+    'black'         : 'black'
+}
 
 # Observational data
 chi2, h, OmegaM, OmegaK = np.loadtxt('results_supernovafitting.txt', skiprows=1000, unpack=True)
@@ -36,10 +50,7 @@ min_index = np.argmin(chi2)
 onesigma = chi2 < chi2[min_index] + 3.53
 twosigma = chi2 < chi2[min_index] + 8.02
 
-# Scatter plot OmegaM vs. OmegaLambda
 
-# ax.scatter(OmegaM[twosigma], OmegaLambda[twosigma], color=cblue, label=r'$2\sigma$ constraint')
-# ax.scatter(OmegaM[onesigma], OmegaLambda[onesigma], color=cred, label=r'$1\sigma$ constraint')
 
 fig, ax = plt.subplots(1, 1, figsize=(6, 5))
 
@@ -51,7 +62,7 @@ if len(OmegaM[twosigma]) > 2:
     # Plot filled region for 2-sigma
     ax.fill(points_2sigma[hull_2sigma.vertices, 0], 
             points_2sigma[hull_2sigma.vertices, 1],
-            color='blue', alpha=0.3, label=r'$2\sigma$ constraint')
+            color=col['blue'], alpha=0.3, label=r'$2\sigma$ constraint')
 
 if len(OmegaM[onesigma]) > 2:
     points_1sigma = np.column_stack([OmegaM[onesigma], OmegaLambda[onesigma]])
@@ -60,17 +71,17 @@ if len(OmegaM[onesigma]) > 2:
     # Plot filled region for 1-sigma
     ax.fill(points_1sigma[hull_1sigma.vertices, 0], 
             points_1sigma[hull_1sigma.vertices, 1],
-            color=cred, alpha=0.8, label=r'$1\sigma$ constraint')
+            color=col['red'], alpha=0.7, label=r'$1\sigma$ constraint')
 
-x = np.linspace(0,1,100)
+x = np.linspace(-1,1,100)
 ax.plot(x, 1-x, linestyle='--', color='black', label='Flat Universe')
 ax.scatter(OmegaM[min_index], OmegaLambda[min_index], edgecolor='black', marker='s', facecolor='none', label=r'Best-fit')
 ax.scatter(OmegaM0, OmegaL0, edgecolor='black', marker='o', s=70, facecolor='none', label=r'Fiducial')
-ax.set_xlim(0, 1)
-ax.set_ylim(0, 1.2)
+ax.set_xlim(-0.1, 0.6)
+ax.set_ylim(0.1, 1.6)
 ax.set_xlabel(r'$\Omega_{M0}$')
 ax.set_ylabel(r'$\Omega_{\Lambda0}$')
-ax.legend()
+ax.legend(loc='upper left', fontsize=13)
 
 plt.savefig('figures/supernova_fitting.pdf')
 
@@ -87,7 +98,7 @@ axs[0].set_xlim(0.1, 1.3)
 mu = np.mean(OmegaLambda)
 sigma = np.std(OmegaLambda)
 x_fit = np.linspace(OmegaLambda.min(), OmegaLambda.max(), 200)
-axs[0].plot(x_fit, norm.pdf(x_fit, mu, sigma), color=cred, linewidth=2)
+axs[0].plot(x_fit, norm.pdf(x_fit, mu, sigma), color=col['red'], linewidth=2)
 axs[0].axvline(OmegaLambda[min_index], linestyle='--', color='black', label=r'Best-fit $\Omega_{\Lambda0}=$'+f' {OmegaLambda[min_index]:.3f}')
 axs[0].axvline(OmegaL0, linestyle=':', color='black', label=r'Fiducial $\Omega_{\Lambda0}=0.683$')
 axs[0].legend(loc='upper right')
@@ -101,7 +112,7 @@ axs[1].set_title(r'Posterior for $h$')
 mu = np.mean(h)
 sigma = np.std(h)
 x_fit = np.linspace(h.min(), h.max(), 200)
-axs[1].plot(x_fit, norm.pdf(x_fit, mu, sigma), color=cred, linewidth=2)
+axs[1].plot(x_fit, norm.pdf(x_fit, mu, sigma), color=col['red'], linewidth=2)
 axs[1].axvline(0.701711, linestyle='--', color='black', label=r'Best-fit $ h=$'+f' {0.701711:.3f}')
 axs[1].axvline(0.67, linestyle=':', color='black', label=r'Fiducial $h=0.67$')
 axs[1].legend(loc='upper right')
@@ -115,7 +126,7 @@ plt.savefig('figures/bestfit_OmegaLambda.pdf')
 ##################
 # Conformal time #
 ##################
-fig, axs = plt.subplots(2,1,figsize=(6,6))
+fig, axs = plt.subplots(2,1,figsize=(6,5))
 
 axs[0].semilogy(lna, eta/3.08567758e22, color='black')
 axs[0].set_ylabel(r'$\eta(x)\; [\mathrm{Mpc}]$')
@@ -124,7 +135,7 @@ axs[0].set_ylim(2e-3,1e5)
 axs[0].label_outer()
 
 axs[1].axhline(1, linestyle='-.', color='black')
-axs[1].plot(lna, eta*Hp/2.99792458e8, color=cred)
+axs[1].plot(lna, eta*Hp/2.99792458e8, color=col['red'])
 axs[1].set_ylabel(r'$\eta\mathcal{H}/c$')
 axs[1].set_xlim(-18,0)
 axs[1].set_ylim(0.75,3.3)
@@ -150,8 +161,8 @@ axs[0].axvline(x_LM_eq, color='black', linestyle=':', linewidth=1)
 axs[0].axvline(x_acc, color='black', linestyle='dashed', linewidth=1)
 axs[0].label_outer()
 
-axs[1].plot(lna, dHpdx/Hp, color=cblue, label=r"$\mathcal{H}'/\mathcal{H}$")
-axs[1].plot(lna, ddHpddx/Hp, color=cred, label=r"$\mathcal{H}''/\mathcal{H}$")
+axs[1].plot(lna, dHpdx/Hp, color=col['blue'], label=r"$\mathcal{H}'/\mathcal{H}$")
+axs[1].plot(lna, ddHpddx/Hp, color=col['red'], label=r"$\mathcal{H}''/\mathcal{H}$")
 axs[1].axvline(x_MR_eq, color='black', linestyle=(0, (3, 1, 1, 1, 1, 1)), linewidth=1)
 axs[1].axvline(x_LM_eq, color='black', linestyle=':', linewidth=1)
 axs[1].axvline(x_acc, color='black', linestyle='dashed', linewidth=1)
@@ -181,9 +192,9 @@ plt.savefig('figures/Hp_derivatives.pdf')
 # Density parameters #
 ######################
 fig, ax = plt.subplots(1, 1, figsize=(6,5))
-ax.plot(lna, OmegaR + OmegaNu, color=cblue, label=r'$\Omega_R$')
-ax.plot(lna, OmegaB + OmegaCDM, color=cred, label=r'$\Omega_M$')
-ax.plot(lna, OmegaL, color=cgreen, label=r'$\Omega_\Lambda$')
+ax.plot(lna, OmegaR + OmegaNu, color=col['blue'], label=r'$\Omega_R$')
+ax.plot(lna, OmegaB + OmegaCDM, color=col['red'], label=r'$\Omega_M$')
+ax.plot(lna, OmegaL, color=col['orange'], label=r'$\Omega_\Lambda$')
 ax.axvline(x_MR_eq, color='black', linestyle=(0, (3, 1, 1, 1, 1, 1)))
 ax.axvline(x_LM_eq, color='black', linestyle=':')
 
@@ -211,10 +222,10 @@ fig, ax = plt.subplots(1,1,figsize=(6,5))
 z_obs, dL_obs, sigma = np.loadtxt('data/supernovadata.txt', unpack=True)
 
 bfz = np.exp(-bflna)-1
-ax.plot(bfz, bflumdist/3.08567758e25/bfz, color=cblue, label=r'Best-fit')
+ax.plot(bfz, bflumdist/3.08567758e25/bfz, color=col['blue'], label=r'Best-fit')
 
 z = np.exp(-lna)-1
-ax.plot(z, lumdist/3.08567758e25/z, color=cred, label=r'Fiducial')
+ax.plot(z, lumdist/3.08567758e25/z, color=col['red'], label=r'Fiducial')
 
 ax.errorbar(z_obs, dL_obs/z_obs, yerr=sigma/z_obs, fmt='o', 
             markerfacecolor='none', color='black', linewidth=0.3,

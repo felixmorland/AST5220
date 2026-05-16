@@ -39,11 +39,13 @@ void PowerSpectrum::solve(){
   auto cell_TT = solve_for_cell(thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
   cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
   
-  auto cell_TE = solve_for_cell(thetaT_ell_of_k_spline, thetaE_ell_of_k_spline);
-  cell_TE_spline.create(ells, cell_TE, "Cell_TE_of_ell");
+  if (Constants.polarization) {
+    auto cell_TE = solve_for_cell(thetaT_ell_of_k_spline, thetaE_ell_of_k_spline);
+    cell_TE_spline.create(ells, cell_TE, "Cell_TE_of_ell");
 
-  auto cell_EE = solve_for_cell(thetaE_ell_of_k_spline, thetaE_ell_of_k_spline);
-  cell_EE_spline.create(ells, cell_EE, "Cell_EE_of_ell");
+    auto cell_EE = solve_for_cell(thetaE_ell_of_k_spline, thetaE_ell_of_k_spline);
+    cell_EE_spline.create(ells, cell_EE, "Cell_EE_of_ell");
+  }
 }
 
 //====================================================
@@ -105,33 +107,6 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
   // Set timestep
   const double dx = x_array[1] - x_array[0];
   
-  // Loop over all ell
-  // for (int ell = 0; ell < ells.size(); ell++) {
-  //   Utils::progressbar(double(ell) / double(ells.size()));
-  //   double los_integral = 0.0;
-
-  //   for(int ik = 0; ik < k_array.size(); ik++){
-  //     const double k = k_array[ik];
-
-
-  //     // Trapezoidal integral
-  //     for (int ix = 0; ix < n_x; ix++) {
-
-  //       double S_tilde = source_function(x_array[ix], k);
-  //       double eta     = cosmo->eta_of_x(x_array[ix]);
-  //       double j_ell   = j_ell_splines[ell](k*(eta0 - eta)); 
-
-  //       if (ix == 0 || ix == n_x - 1) {
-  //         los_integral += S_tilde*j_ell/2.0;
-  //       }
-  //       else {
-  //         los_integral += S_tilde*j_ell;
-  //       }
-  //     }
-  //     // Store the result for Source_ell(k) in results[ell][ik]
-  //     result[ell][ik] = los_integral*dx;
-  //   }
-  // }
   // Loop over all k
   std::cout << "\nLine of sight integration: " << func_name << "...\n";
   for(int ik = 0; ik < k_array.size(); ik++){
@@ -229,7 +204,7 @@ Vector PowerSpectrum::solve_for_cell(
   ){
   const int nells       = ells.size();
   const double eta0     = cosmo->eta_of_x(0.0);
-  const double dk       = M_PI / eta0 / 64.0;
+  const double dk       = M_PI / eta0 / 32.0;
   const int n           = int((k_max - k_min) / dk);
 
   Vector log_k_array    = Utils::linspace(log(k_min), log(k_max), n); 
@@ -275,9 +250,10 @@ double PowerSpectrum::primordial_power_spectrum(const double k) const{
 //====================================================
 
 double PowerSpectrum::get_matter_power_spectrum(const double x, const double k) const{
-  double Hp   = cosmo->Hp_of_x(x);
-  double Phi  = pert->get_Phi(x,k);
-  double Delta_M = 2.0 / 3.0 * pow(Constants.c*k / Hp, 2.0) * Phi;
+  double Hp      = cosmo->Hp_of_x(x);
+  double Phi     = pert->get_Phi(x,k);
+  double OmegaM0 = cosmo->get_OmegaM(0.0);
+  double Delta_M = 2.0 / 3.0 * pow(Constants.c*k / Hp, 2.0) * Phi / OmegaM0*exp(x);
 
   double pofk = 2.0 * pow(M_PI * Delta_M, 2.0) * pow(k, -3.0) * primordial_power_spectrum(k);
 
@@ -317,11 +293,10 @@ void PowerSpectrum::output_CMB_spectrum(std::string filename) const{
     double normfactor_TE  = sqrt((ell+2.0) * (ell+1.0) * ell * (ell-1.0)) * normfactor;
     double normfactor_EE  = (ell+2.0) * (ell+1.0) * ell * (ell-1.0)
                             * 1e5 * pow(1e6*cosmo->get_TCMB(), 2.0);
-    double normfactorN = (ell * (ell+1)) / (2.0 * M_PI) 
-      * pow(1e6 * cosmo->get_TCMB() *  pow(4.0/11.0, 1.0/3.0), 2);
-    double normfactorL = (ell * (ell+1)) * (ell * (ell+1)) / (2.0 * M_PI);
+
     fp << ell                                 << " ";
     fp << cell_TT_spline( ell ) * normfactor  << " ";
+
     if(Constants.polarization){
       fp << cell_EE_spline( ell ) * normfactor_EE  << " ";
       fp << cell_TE_spline( ell ) * normfactor_TE  << " ";
@@ -336,8 +311,15 @@ void PowerSpectrum::output_matter_power_spectrum(std::string filename) const{
 
   auto k_array = exp(Utils::linspace(log(k_min), log(k_max), 2000));
   double h     = cosmo->get_h();
+  double OmegaRtot = cosmo->get_OmegaRtot();
+  double OmegaM = cosmo->get_OmegaM();
+
+  double x_MR_eq = log(OmegaRtot / OmegaM);
+  // Equality scale
+  fp << cosmo->Hp_of_x(x_MR_eq) * Constants.Mpc / Constants.c / h << "\n";
+
   auto print_data = [&] (const double k) {
-    fp << k * Constants.Mpc / h                                     << " ";
+    fp << k * Constants.Mpc / h                                               << " ";
     fp << get_matter_power_spectrum(0.0, k) / pow(Constants.Mpc / h, 3.0)     << " "; 
     fp << "\n";
   };

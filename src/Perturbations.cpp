@@ -710,9 +710,7 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
 
   // 2 <= ell < ell_max
   for (int ell = 2; ell < n_ell_theta-1; ell++) {
-    *(dThetadx+ell) = polarization ? 
-                      (c*k/((2.0*ell + 1.0)*Hp)) * (ell* *(Theta+ell-1) - (ell+1)* *(Theta+ell+1)) + dtaudx*(*(Theta+ell) - Pi/10.0*(ell==2)) :
-                      (c*k/((2.0*ell + 1.0)*Hp)) * (ell* *(Theta+ell-1) - (ell+1)* *(Theta+ell+1)) + dtaudx*(*(Theta+ell));
+    *(dThetadx+ell) = (c*k/((2.0*ell + 1.0)*Hp)) * (ell* *(Theta+ell-1) - (ell+1)* *(Theta+ell+1)) + dtaudx*(*(Theta+ell) - Pi/10.0*(ell==2));
   }
 
   // ell_max
