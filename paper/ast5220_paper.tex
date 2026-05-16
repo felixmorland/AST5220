@@ -7,6 +7,7 @@
 \usepackage{enumitem}
 \usepackage{multirow}
 
+
 % \usepackage{caption}
 % \usepackage[options]{hyperref}
 
@@ -25,7 +26,7 @@
 
 \begin{document} 
 
-   \title{Calculating the CMB power spectrum from simulated cosmic structure formation initiated by primordial fluctuations}
+   \title{Simulating cosmic perturbations and the CMB power spectrum from inflationary initial conditions in $\Lambda$CDM}
 
    \author{Felix Morland\inst{1}\thanks{The code developped for this project is available at \href{https://github.com/felixmorland/AST5220}{GitHub}.}}
 
@@ -33,15 +34,16 @@
                 University of Oslo,  0315 Oslo,  Norway\\
               \email{astro@felixmorland.no}
              }
-
    \date{}
 
-  \abstract{I will write an abstract for the whole project at the end, once I have completed all the milestones.}
+  \abstract{We build a numerical Einstein-Boltzmann code from scratch, heavily inspired by the guide written by \cite{callin2006} and the lectures by \cite{winther_lectures}. It had the goal of simulating cosmic structure formation in a flat $\Lambda$CDM universe and computing the CMB and matter power spectra from first principles. The code was developped as a project in the course AST5220 at the University of Oslo during the Spring semester 2026. It solves the coupled Boltzmann hierarchies for cold dark matter, baryons, photons, and massless neutrinos from adiabatic inflationary initial conditions, using a tight-coupling approximation to stabilise the integration through the stiff pre-recombination epoch and the line-of-sight integral of \citet{LOS_integration} to recover the photon transfer functions at high multipoles. The recombination history is computed through the Saha and Peebles regimes with helium and reionisation included, giving a sound horizon at decoupling of $r_s \simeq 144.413\,\text{Mpc}$. The predicted CMB temperature, E-mode polarisation, and cross power spectra, as well as the matter power spectrum, are found to be in excellent agreement with observations from Planck 2018 \citep{planck2020}, SDSS, and the Ly$\alpha$ forest.}
 
-   \keywords{   cosmic microwave background  --
-                large-scale structure of Universe --
-                linear perturbations
-               }
+   \keywords{   
+      cosmology --
+      cosmic microwave background  --
+      perturbation theory --
+      Einstein-Boltzmann solver
+}
 
    \titlerunning{CMB Power Spectrum}
    \authorrunning{F. Morland}
@@ -49,15 +51,19 @@
    \maketitle
 
 \section*{0. Introduction}
-I will write an introduction for the whole project at the end, once I have completed all the milestones.
 
-\begin{figure}[h!]
+The cosmic microwave background (CMB) is the radiation released at recombination, when the Universe had cooled sufficiently for electrons and protons to combine into neutral hydrogen and the photons decoupled from the baryon plasma. The resulting temperature field is nearly uniform at $T_\text{CMB0} \simeq 2.7255\,\text{K}$ today, but features tiny fluctuations of order $\delta T/T \sim 10^{-5}$, visible in the WMAP full-sky map in Figure~\ref{fig:WMAP}. These perturbations encode the initial conditions set by inflation and the subsequent evolution of the photon-baryon plasma, making the CMB angular power spectrum one of the most powerful probes of cosmological parameters.
+
+The large-scale structure of the Universe shares the same origin. Primordial perturbations seeded during inflation were amplified by gravity, and the acoustic oscillations of the photon-baryon plasma left coherent imprints on both the CMB and the matter distribution. Computing these observables from first principles therefore requires evolving a set of 29 coupled perturbation equations for all species from deep in the radiation-dominated era to the present day.
+
+In this project we build a numerical Einstein-Boltzmann code heavily based on the guide written by \cite{callin2006} and the curriculum in the course AST5220 teached by Hans A. Winther at the University of Oslo \citep{winther_lectures}. The model simulates cosmic structure formation in a flat $\Lambda$CDM universe with Planck 2018 fiducial parameters \citep{planck2020}, including cold dark matter, baryons, photons, massless neutrinos, and a cosmological constant. We first establish the background cosmology, then compute the recombination history, before evolving the full perturbation hierarchy using the tight-coupling approximation and the line-of-sight integral of \citet{LOS_integration} to efficiently recover the high-$\ell$ transfer functions. Finally, we compute the CMB temperature, polarisation, and cross power spectra as well as the matter power spectrum, and compare our predictions to observational data.
+
+\begin{figure}
       \centering
       \includegraphics[width=0.9\linewidth]{../figures/cmb_wmap.png}
-      \caption{CMB \citep{cmb}}
+      \caption{CMB map \citep{cmb}.}
+      \label{fig:WMAP}
 \end{figure}
-
-
 
 \section{Background cosmology}
 To compute the CMB power spectrum, we must first establish the background cosmological model upon which perturbations will evolve. This section details the construction of this background Universe. We begin by outlining the theoretical framework, most notably the Friedmann-Lemaître-Robertson-Walker (FLRW) metric and the resulting Friedmann equations that governs the expansion history and the evolution of its energy components. Subsequently, we describe the numerical implementation of this model, including the fiducial parameters adopted from Planck 2018. Finally, we validate our implementation by comparing its predicted timeline of cosmic epochs and derived quantities, such as the age of the universe, against theoretical expectations, and we present the results of an MCMC parameter fit to supernova data, which contextualizes the well-known Hubble tension within our model.
@@ -575,10 +581,10 @@ The final freeze-out abundance of free electrons today was calculated to be $X_e
             \hline
             \multicolumn{2}{c|}{Event} & Log scale factor $x$ & Redshift $z$& Time $t$ [Myr]\\
             \hline
-            \multirow{2}{*}{Decoupling}   & Peebles & -6.9728 & 1066.23 & 0.3861\\
-                                          & Saha & -7.1581 & 1283.46 & 0.2822\\
+            \multirow{2}{*}{Decoupling}   & Peebles & -6.99474 & 1089.88 & 0.37211\\
+                                          & Saha & -7.17033 & 1299.28 & 0.276427\\
             \hline
-            \multirow{2}{*}{Recombination}& Peebles & -6.9701 & 1063.36 & $0.3878$\\
+            \multirow{2}{*}{Recombination}& Peebles & -6.97013 & 1063.36 & $0.3878$\\
                                           & Saha & -7.1404 & 1260.87 & $0.2909$\\
             \hline\hline
             \multicolumn{5}{c}{}
@@ -587,37 +593,6 @@ The final freeze-out abundance of free electrons today was calculated to be $X_e
       \label{tab:recombination history}
 \end{minipage}
 \end{table*}
-
-% Yp:                          0.245
-% Reionisation:                false
-
-% Decoupling
-% ----------------------------------------
-% x_dec:                 -6.99474
-% z_dec:                 1089.88
-% t_dec:                 0.00037211
-
-% Recombination
-% -------------------------------------
-% x_rec:                -6.97013
-% z_rec:                1063.36
-% t_rec:                0.000387835
-
-% Decoupling (SAHA)
-% ----------------------------------
-% x_dec_saha:           -7.17033
-% z_dec_saha:           1299.28
-% t_dec_saha:           0.000276427
-
-% Recombination (SAHA)
-% -------------------------------
-% x_rec_saha:           -7.14035
-% z_rec_saha:           1260.87
-% t_rec_saha:           0.000290885
-
-% Sound horizon at decoupling: 144.413
-% Freeze-out Xe(0):            0.000267362
-% Integral of g_tilde:         1
 
 \subsubsection{The optical depth and visibility function}
 
@@ -645,21 +620,17 @@ Including helium, as in panels~(c) and~(d), leaves its most visible imprint on t
 
 Figure~\ref{fig:visibility func} shows the visibility function $\tilde{g}$ and its first two derivatives for the fiducial model with both hydrogen and helium. The visibility function is sharply peaked at $x_\mathrm{dec} = -6.973$, marking the epoch of decoupling, commonly referred to as the surface of last scattering, where the probability of a CMB photon undergoing its last Thomson scattering is maximised. The sharpness of this peak reflects the relatively brief duration of recombination: although recombination is not instantaneous, the transition from an opaque to a transparent Universe occurs over a narrow range of $x$, so the surface of last scattering is well-defined.
 
-The small bump visible at $x \sim -2.5$ corresponds to reionisation, where the rise in $X_e$ briefly increases the scattering rate and produces a small but non-zero probability of late-time scattering. Since $\tilde{g}$ represents the probability density that a photon was last scattered at a given $x$, it must satisfy the normalisation condition $\int_{-\infty}^{0} \tilde{g}(x)\,\mathrm{d}x = 1$, which our numerical implementation reproduces to machine precision, confirming the consistency of our solution. The derivatives $\tilde{g}'$ and $\tilde{g}''$ are smooth and well-behaved, and will be needed as source terms when computing CMB temperature and polarisation anisotropies. The decoupling times predicted by the Saha approximation and the Peebles equation are compared in Table~\ref{tab:recombination history}.
+The small bump visible at $x \sim -2.5$ corresponds to reionisation, where the rise in $X_e$ briefly increases the scattering rate and produces a small but non-zero probability of late-time scattering. Since $\tilde{g}$ represents the probability density that a photon was last scattered at a given $x$, it must satisfy the normalisation condition $\int_{-\infty}^{0} \tilde{g}(x)\,\mathrm{d}x = 1$, which our numerical implementation reproduces to machine precision, confirming the consistency of our solution. The derivatives $\tilde{g}'$ and $\tilde{g}''$ are smooth and well-behaved, and will be needed as source terms when computing CMB temperature and polarisation anisotropies. The decoupling times predicted by the Saha approximation and the Peebles equation are compared in Table~\ref{tab:recombination history}. The full Peebles solution better matches the $\Lambda$CDM prediction of $z_\text{rec}\sim 1100$.
 
 
 
 \subsubsection{Sound horizon at decoupling}
 
-Evaluating the sound horizon at decoupling $r_s$ for the fiducial model, i.e. at $x_\mathrm{dec} = -6.9728$ (corresponding to redshift $z_\mathrm{dec} = 1066.23$), we find
-\begin{equation*}
-    r_s \equiv s(x_\mathrm{dec}) \simeq 144.413\;\mathrm{Mpc}.
-\end{equation*}
+Evaluating the sound horizon at decoupling $r_s$ for the fiducial model, i.e. at $x_\mathrm{dec} = -6.99474$ (corresponding to redshift $z_\mathrm{dec} = 1089.88$), we find
+\begin{equation}
+    r_s \equiv s(x_\mathrm{dec}) \simeq 144.413\;\mathrm{Mpc}.\label{eq:rs}
+\end{equation}
 This value is in good agreement with the standard result from \textit{Planck} \citep{planck2020}, and sets a fundamental physical scale in the Universe. At decoupling there is no longer any radiative pressure to counteract the gravitational collapse of the baryons, so the acoustic oscillations in the photon-baryon plasma are frozen in place, and the sound horizon marks the maximum distance over which these oscillations could have coherently developed. This scale is directly imprinted as the characteristic angular separation of the acoustic peaks in the CMB power spectrum, and as the baryon acoustic oscillation (BAO) scale in the matter power spectrum.
-\td{
-Comment pure Saha decoupling/recombination and Peebles\\
-Update data in table
-}
 
 
 
@@ -897,12 +868,12 @@ The polarisation multipoles $\Theta^P_0$, $\Theta^P_1$, and $\Theta^P_2$, seen i
 
 
 
-\section{CMB and matter power spectra}
-Some introduction about what it is all about.
-\td{INTRODUCTION}
+\section{The CMB and matter power spectra}
+
+Having evolved the perturbations, we are now in a position to compute the observable power spectra that connect our theoretical model to data. Comparing the predicted power spectra to observations from Planck 2018 \citep{planck2020} and large-scale structure surveys provides a test of the model. We give a synopsis of the theoretical framework for computing the CMB temperature, cross TE, EE polarisation and matter power spectra, describe the numerical implementation, and present the results.
 
 \subsection{Theory}
-\td{Intro}
+In this section we outline the theory that allows us to produce the different power spectra obtained from the simulated perturbations, once again following \cite{winther_lectures,winther_milestone4}. The CMB temperature power spectrum $C_\ell$ is constructed from the photon transfer functions $\Theta_\ell(k)$, which we evaluate efficiently at high $\ell$ using the line-of-sight integral of Seljak and Zaldarriaga \citep{LOS_integration}. The same approach yields the polarisation spectra $C_\ell^{EE}$ and $C_\ell^{TE}$, and we conclude with the matter power spectrum $\mathcal{P}(k)$.
 
 \subsubsection{CMB power spectrum}
 To get the CMB power spectrum from the perturbations we evolved in the previous section, we must decompose the CMB temperature field into an expansion in spherical harmonics (SH)
@@ -996,7 +967,7 @@ We follow the same LOS integration procedure for calculating the E-mode polarisa
 %%%
 % CELL: log spaced k, dlogk = pi/32keta0
 %%%
-Having solved for the $\Theta_\ell$ and $\Theta_\ell^E$ multipoles, we are now in the place to perform the integral in Eq.(\ref{eq:cell}) and solve for the CMB power spectrum $C_\ell$, as well as the cross and polarisation power spectra; $C_\ell^{TE}$ and $C_\ell^{EE}$. This is done through the trapezoidal integral method, just as we did for the LOS integrals, sampling log-spaced $k$-values with resolution $\Delta(\ln k)=\pi/32k\eta_0$,
+Having solved for the $\Theta_\ell$ and $\Theta_\ell^E$ multipoles, we are now in the place to perform the integral in Eq.(\ref{eq:cell}) and solve for the CMB power spectrum $C_\ell$, as well as the cross and polarisation power spectra; $C_\ell^{TE}$ and $C_\ell^{EE}$. This is done through the trapezoidal integral method, just as we did for the LOS integrals, sampling log-spaced $k$-values with resolution $\Delta(\ln k)=\pi/32k_\text{max}\eta_0$,
 
 \begin{equation*}
       C_\ell = 4\pi \sum_{i=1}^{N_k} \mathcal{P}_\text{prim.}(k_i)\Theta_\ell^2(k_i)\Delta(\ln k),
@@ -1049,15 +1020,23 @@ The current day matter power spectrum $\mathcal{P}(k)$ derived from our model is
 The spectrum rises toward a peak near $k_\text{eq}\equiv \mathcal{H}(x_\text{eq}^{MR})/c$, the wavenumber corresponding to the mode that entered the horizon at matter-radiation equality, and falls off as a power law on either side of this turnover scale. Modes with $k < k_\text{eq}$ entered the horizon during matter domination and after recombination, such that they grew virtually unimpeded by the radiation pressure, preserving the near scale-invariant primordial spectrum $\mathcal{P}_\text{prim.}(k) \propto k^{n_s}$ on large scales. Modes with $k > k_\text{eq}$ entered the horizon during radiation domination, when radiation pressure prevented gravitational collapse and the growth of the CDM perturbations was logarithmically suppressed, the so-called Meszaros effect \citep{Meszaros}. This suppression causes the characteristic turnover and the subsequent power-law decay at small scales. At the largest scales the Ly$\alpha$ and SDSS data overlap well with each other and with the theory, as shown in the inset, confirming that the model captures the correct shape of the power spectrum across a wide range of physical scales.
 
 \subsubsection{CMB and polarisation power spectra}
+The temperature power spectrum $C_\ell$ is shown in Figure \ref{fig:CMB PS}, alongside Planck 2018 data \citep{planck2020} at both low and high $\ell$. The theoretical prediction is in excellent agreement with the data across the full range of multipoles. The spectrum displays the characteristic series of acoustic peaks, arising from the oscillations of the photon-baryon plasma at recombination: modes that were at the extrema of their oscillation at last scattering contribute enhanced power, while those caught at a node are suppressed. The peaks are progressively damped at high $\ell$ by diffusion damping, which smooths out small-scale anisotropies. The lower panel decomposes the total power into its constituent source terms. The SW term dominates at large scales ($\ell \lesssim 100$), producing the characteristic plateau, while the Doppler and SW terms together make up the acoustic peaks at intermediate scales. The ISW contribution is subdominant across most of the spectrum but adds power at the largest scales through the decay of gravitational potentials. The polarisation term is the smallest contribution but becomes relatively more important at high $\ell$. Also shown is a simplified model run with no helium, reionisation, neutrinos, nor polarisation. The acoustic peaks are visibly shifted to the left (towards lower $\ell$) and has a strikingly higher third peak compared to the full model. The more pronounced high $\ell$ acoustic peaks illustrate how the extra components in the full theory suppress power at small scales.
+
+The largest of the acoustic peaks is the first, located at around $\ell\sim 200$. This matches well with the characteristic scale set up by the BAO in the early Universe. In fact, we previously calculated the sound horizon at decoupling to be $r_s=144.413\mbox{ Mpc}$, Eq.(\ref{eq:rs}), which corresponds to a wavenumber of $k_s = 1/r_s \simeq 6.925\times 10^{-3} /\mbox{Mpc}$, which leaves a signature in the power spectrum at $\ell\sim k\eta_0 \simeq 194.7$.
+
+The TE cross power spectrum and the EE polarisation power spectrum are shown in Figure \ref{fig:polarisation PS}. Both are in excellent agreement with Planck 2018 data across the full multipole range. The TE spectrum oscillates between positive and negative values, reflecting the phase relationship between the temperature and polarisation fields; polarisation is generated at last scattering by the quadrupole anisotropy of the radiation field, which is $\pi/2$ out of phase with the temperature monopole, causing the cross spectrum to change sign at each acoustic peak. The EE spectrum displays a similar series of oscillations, with peaks offset relative to those in $C_\ell$ for the same reason, and is suppressed by roughly four orders of magnitude compared to the temperature spectrum, consistent with polarisation being a small correction sourced only near last scattering.
+
+Finally, Figure \ref{fig:CMB map sim} shows a simulated CMB temperature map generated from the computed $C_\ell$. The map is a generated random realisation of the temperature perturbations and displays temperature fluctuations of order $\pm 500\,\mu\text{K}$. The map is consistent with a Gaussian random field, as expected from inflation, and is a qualitative visual confirmation that the computed power spectrum reflects the correct appearance of the CMB as the observations, e.g. the WMAP CMB map (see Figure \ref{fig:WMAP}).
 
 
 
-\section{Conclusions}
+\section*{5. Conclusions}
 
-I will write a short summary and conclusion in the end.
+In this project we have built a numerical Einstein-Boltzmann code that simulates cosmic structure formation in a flat $\Lambda$CDM universe and computes the CMB and matter power spectra from first principles. Starting from the background cosmology, we established the expansion history and tested the model against SNIa luminosity distance data, recovering the well-known Hubble tension between the CMB-inferred and late-universe galaxy survey values of $h$. We then computed the recombination history, solving for the free electron fraction through the Saha and Peebles regimes and including helium and reionisation, and determined the sound horizon at decoupling to be $r_s \simeq 144.413\,\text{Mpc}$, in good agreement with Planck 2018. The coupled perturbation equations for CDM, baryons, photons, neutrinos, and the gravitational potentials were then evolved from adiabatic inflationary initial conditions, using the tight-coupling approximation to handle the stiff pre-recombination system. Finally, the photon transfer functions were projected onto multipoles via the line-of-sight integral, and the resulting CMB temperature, polarisation, and cross power spectra as well as the matter power spectrum were compared to observational data, finding excellent agreement across all observables.
+
 
 \begin{acknowledgements}
-      Thank you to Hans A. Winther for brilliant lectures and help with the project, and to Petter Callin for writing a great guide for how to carry out a project like this.
+      A big thank you to Hans A. Winther for brilliant lectures and help with the project, and to Petter Callin for writing a great guide for how to carry out a project like this.
 \end{acknowledgements}
 
 \bibliographystyle{aa}
@@ -1065,14 +1044,14 @@ I will write a short summary and conclusion in the end.
 
 
 \begin{appendix}
+\clearpage
 \section{Derivatives of the conformal Hubble function}
 \label{appendix:derivatives of Hp}
-
 The Hubble function is given by
 \begin{equation*}
-H = H_0 \sqrt{(\Omega_{b0}+\Omega_{\rm CDM 0})a^{-3} + (\Omega_{\gamma 0} + \Omega_{\nu 0}) a^{-4} + \Omega_{k 0} a^{-2} + \Omega_{\Lambda 0}},
+H = H_0 \sqrt{\frac{\Omega_{b0}+\Omega_{\rm CDM 0}}{a^3} + \frac{\Omega_{\gamma 0}+\Omega_{\nu 0}}{a^4} + \frac{\Omega_{k0}}{a^2} + \Omega_{\Lambda 0}},
 \end{equation*}
-where we can define $\Omega_{M0}\equiv \Omega_{b0}+\Omega_{\rm CDM 0}$ and $\Omega_{R0}\equiv \Omega_{\gamma 0} + \Omega_{\nu 0}$. The first derivative of the conformal Hubble function $\mathcal{H}\equiv aH(a)$ with respect to $x\equiv\ln a$ is
+where we can define $\Omega_{M0}\equiv \Omega_{b0}+\Omega_{\rm CDM 0}$ and $\Omega_{R0}\equiv \Omega_{\gamma 0}+\Omega_{\nu 0}$. The first derivative of the conformal Hubble function $\mathcal{H}\equiv aH(a)$ with respect to $x\equiv\ln a$ is
 \begin{align*}
       \dd{\mathcal{H}}{x} &= \dd{a}{x}H + a \dd{H}{x} = \mathcal{H} + a^2 \dd{H}{a}.
 \end{align*}
@@ -1085,7 +1064,7 @@ This gives
       \dd{\mathcal{H}}{x} &= \mathcal{H} - a^2 \frac{H_0^2}{2H}\Big(3\Omega_{M0}a^{-4} + 4\Omega_{R 0} a^{-5} + 2\Omega_{k 0} a^{-3} \Big)\\
       &= \mathcal{H}\bigg[1- \frac{3}{2}\Omega_{M} -2\Omega_{R} - \Omega_K\bigg].
 \end{align*}
-Here the $\Omega_i$'s refer to the density parameters as functions of scale factor, i.e. $\Omega_i(a)$, which should be evaluated at $a=e^x.$\\
+Here the $\Omega_i$'s refer to the density parameters as functions of scale factor, i.e. $\Omega_i(a)$, which should be evaluated at $a=e^x.$
 
 The second derivative is a bit more cumbersome to calculate; from the product rule it follows that 
 \begin{align*}
@@ -1103,8 +1082,6 @@ From this we end up with second derivative
       \dd{^2\mathcal{H}}{x^2} =&\; \mathcal{H}\Bigg\{\bigg[1-\frac{3}{2}\Omega_M -2\Omega_R  -\Omega_K\bigg]^2\\
       & -\frac{1}{2}\Big(3\Omega_M + 4\Omega_R + 2\Omega_K \Big)^2+\frac{1}{2}\Big(9\Omega_M +16\Omega_R +4\Omega_K\Big)\Bigg\} \;\Bigg|_{a = e^x}.
 \end{align*}
-
-
 \section{Logarithmic scale factor at different cosmological events}
 \label{appendix:cosmological events}
 
@@ -1130,7 +1107,6 @@ At late times, the radiation density parameter can be neglected, so we end up wi
 \begin{align*}
       x_\text{acc} \equiv \ln a_\text{acc} = \frac{1}{3}\ln\bigg(\frac{\Omega_{M0}}{2\Omega_{\Lambda 0}}\bigg)\;.
 \end{align*}
-
 \section{Legendre polynomials and spherical Bessel functions}
 \label{appendix:legendre}
 The Legendre polynomials $P_\ell(\mu)$ are functions of $\mu = \cos\theta$, where $\theta$ is the angle between two vectors. They arise naturally in problems with spherical symmetry, such as expansions of gravitational or electrostatic potentials. The first four are
@@ -1172,7 +1148,6 @@ A key identity linking the Bessel functions and the Legendre polynomials is the 
       e^{i\mathbf{k}\cdot\mathbf{r}} = \sum_{\ell=0}^{\infty} i^\ell (2\ell+1)\,j_\ell(kr)\,P_\ell(\hat{k}\cdot\hat{r}),
 \end{equation*}
 which decomposes a plane wave into spherical waves of definite angular momentum $\ell$, and explains the appearance of the $i^\ell$ factor in the multipole expansion above.
-
 \section{$\ell$-values}
 \begin{table}[h!]
 \centering

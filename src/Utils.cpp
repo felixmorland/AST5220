@@ -1,5 +1,6 @@
 #include "Utils.h"
 
+struct SimulationParameters SimParams;
 struct ConstantsAndUnits Constants;
 
 namespace Utils{

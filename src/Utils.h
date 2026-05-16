@@ -15,6 +15,37 @@
 #include "Spline.h"
 #include "ODESolver.h"
 
+// Simulation parameters - set in Main.cpp, accessible from all files
+extern struct SimulationParameters {
+  // Background parameters
+  double h;
+  double OmegaCDM;
+  double OmegaK;
+  double OmegaB;
+  double Neff;
+  double TCMB;
+  
+  bool neutrinos = true;
+  bool polarisation = true;
+  
+  // Recombination parameters
+  double Yp;
+  bool reionisation;
+  
+  // Power-spectrum parameters
+  double A_s;
+  double n_s;
+  double kpivot_mpc;
+  
+  // Min and max k-value
+  double k_min;
+  double k_max;
+  
+  // Min and max x-value
+  double x_start;
+  double x_end;
+} SimParams;
+
 // The constants used in this code. Everything is here in SI units
 extern struct ConstantsAndUnits {
   // Basic units (here we use SI)
@@ -45,24 +76,12 @@ extern struct ConstantsAndUnits {
   const double epsilon_0   = 13.605693122994 * eV;        // Ionization energy for the ground state of hydrogen
   const double xhi0        = 24.587387 * eV;              // Ionization energy for neutral Helium
   const double xhi1        = 4.0 * epsilon_0;             // Ionization energy for singly ionized Helium
-  
-  // Min and max k-value
-  const double k_min = 0.00005 / Mpc;
-  const double k_max = 1.0     / Mpc;
-  
-  // Min and max x-value
-  const double x_start = log(1e-8);
-  const double x_end   = 0.0;
-
-  // Include polarization and/or neutrinos?
-  const bool polarization  = true;
-  const bool neutrinos     = true;
 
   // For integration of perturbations (number of equations and positions in arrays)
   const int n_scalars           = 5;
   const int n_ell_theta         = 8;
-  const int n_ell_thetap        = 8 * polarization;
-  const int n_ell_neutrinos     = 8 * neutrinos;
+  const int n_ell_thetap        = 8 * SimParams.polarisation;
+  const int n_ell_neutrinos     = 8 * SimParams.neutrinos;
   const int n_ell_tot_full      = n_scalars + n_ell_theta + n_ell_thetap + n_ell_neutrinos;
   const int ind_deltacdm        = 0; 
   const int ind_deltab          = 1;
@@ -88,7 +107,6 @@ extern struct ConstantsAndUnits {
   const int ind_start_theta_tc  = n_scalars_tc;
   const int ind_start_thetap_tc = ind_start_theta_tc  + n_ell_theta_tc;
   const int ind_start_nu_tc     = ind_start_thetap_tc + n_ell_thetap_tc;
-
 } Constants;
 
 namespace Utils {

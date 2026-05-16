@@ -13,7 +13,7 @@ Perturbations::Perturbations(
   // Neutrino fraction
   double Omega_gamma0 = cosmo->get_OmegaR();
   double Omega_nu0    = cosmo->get_OmegaNu();
-  f_nu = Omega_nu0 / (Omega_gamma0 + Omega_nu0) * Constants.neutrinos;
+  f_nu = Omega_nu0 / (Omega_gamma0 + Omega_nu0) * SimParams.neutrinos;
 }
 
 //====================================================
@@ -119,7 +119,7 @@ void Perturbations::integrate_perturbations(){
       double Hp     = cosmo->Hp_of_x(x_array[ix]);
       double dtaudx = rec  ->dtaudx_of_x(x_array[ix]);
       // Theta 2
-      y_array[Constants.ind_start_theta + 2][ix + n_x*ik] = Constants.polarization ?
+      y_array[Constants.ind_start_theta + 2][ix + n_x*ik] = SimParams.polarisation ?
                           -8.0*c*k/(15.0*Hp*dtaudx) * y_array[Constants.ind_start_theta+1][ix + n_x*ik] :
                           -20.0*c*k/(45.0*Hp*dtaudx) * y_array[Constants.ind_start_theta+1][ix + n_x*ik];
       
@@ -132,7 +132,7 @@ void Perturbations::integrate_perturbations(){
     //==========================================
     // Fill in ThetaP
     //==========================================
-    if (Constants.polarization) {
+    if (SimParams.polarisation) {
       for (int ix = 0; ix < idx_end; ix++) {
         double Hp     = cosmo->Hp_of_x(x_array[ix]);
         double dtaudx = rec  ->dtaudx_of_x(x_array[ix]);
@@ -152,7 +152,7 @@ void Perturbations::integrate_perturbations(){
     //==========================================
     // Fill in Nu
     //==========================================
-    if (Constants.neutrinos) {
+    if (SimParams.neutrinos) {
       for (int ell = 0; ell < Constants.n_ell_neutrinos_tc; ell++) {
         auto y_tight_array = y_tight_ode.get_data_by_component(Constants.ind_start_nu_tc+ell);
         for (int ix = 0; ix < idx_end; ix++) {
@@ -202,13 +202,13 @@ void Perturbations::integrate_perturbations(){
   for (int ell = 0; ell < Constants.n_ell_theta; ell++) {
     Theta_spline[ell].create(x_array, k_array, y_array[Constants.ind_start_theta+ell]);
   } 
-  if (Constants.polarization) {
+  if (SimParams.polarisation) {
     ThetaP_spline = std::vector<Spline2D>(Constants.n_ell_thetap);
     for (int ell = 0; ell < Constants.n_ell_thetap; ell++) {
       ThetaP_spline[ell].create(x_array, k_array, y_array[Constants.ind_start_thetap+ell]);
     }
   }
-  if (Constants.neutrinos) {
+  if (SimParams.neutrinos) {
     Nu_spline = std::vector<Spline2D>(Constants.n_ell_neutrinos);
     for (int ell = 0; ell < Constants.n_ell_neutrinos; ell++) {
       Nu_spline[ell].create(x_array, k_array, y_array[Constants.ind_start_nu+ell]);
@@ -229,11 +229,11 @@ void Perturbations::integrate_perturbations(){
     for (int ik = 0; ik < n_k; ik++) {
       double k = k_array[ik];
 
-      Psi_array[ix + n_x*ik] = Constants.neutrinos ?
+      Psi_array[ix + n_x*ik] = SimParams.neutrinos ?
                     -get_Phi(x,k) - 12.0*pow(H0/(c*k), 2.0)*exp(-2.0*x) * (OmegaR0*get_Theta(x,k,2) + OmegaNu0*get_Nu(x,k,2)) :
                     -get_Phi(x,k) - 12.0*pow(H0/(c*k), 2.0)*exp(-2.0*x) * (OmegaR0*get_Theta(x,k,2));
       
-      Pi_array[ix + n_x*ik] = Constants.polarization ?
+      Pi_array[ix + n_x*ik] = SimParams.polarisation ?
                     get_Theta(x,k,2) + get_Theta_p(x,k,0) + get_Theta_p(x,k,2) :
                     get_Theta(x,k,2);
     }
@@ -259,8 +259,8 @@ Vector Perturbations::set_ic(const double x, const double k) const{
   const int n_ell_theta_tc      = Constants.n_ell_theta_tc;
   const int n_ell_neutrinos_tc  = Constants.n_ell_neutrinos_tc;
   const int n_ell_tot_tc        = Constants.n_ell_tot_tc;
-  const bool polarization       = Constants.polarization;
-  const bool neutrinos          = Constants.neutrinos;
+  const bool polarization       = SimParams.polarisation;
+  const bool neutrinos          = SimParams.neutrinos;
 
   // References to the tight coupling quantities
   double &delta_cdm    =  y_tc[Constants.ind_deltacdm_tc];
@@ -329,8 +329,8 @@ Vector Perturbations::set_ic_after_tight_coupling(
   const int n_ell_theta         = Constants.n_ell_theta;
   const int n_ell_thetap        = Constants.n_ell_thetap;
   const int n_ell_neutrinos     = Constants.n_ell_neutrinos;
-  const bool polarization       = Constants.polarization;
-  const bool neutrinos          = Constants.neutrinos;
+  const bool polarization       = SimParams.polarisation;
+  const bool neutrinos          = SimParams.neutrinos;
 
   // Number of multipoles we have in the tight coupling regime
   const int n_ell_theta_tc      = Constants.n_ell_theta_tc;
@@ -500,7 +500,7 @@ void Perturbations::compute_source_functions(
       
       ST_array[index] = SW_term + ISW_term + Doppler_term + Polarization_term;
 
-      if(Constants.polarization){
+      if(SimParams.polarisation){
         SE_array[index] = (x <= -2.5) ?
                           3.0*g_tilde*Pi / (4.0*pow(k*chi, 2.0)) :
                           SE_array[index - 1];
@@ -510,7 +510,7 @@ void Perturbations::compute_source_functions(
 
   // Spline the source functions
   ST_spline.create(x_array, k_array, ST_array, "Source_Temp_x_k");
-  if(Constants.polarization){
+  if(SimParams.polarisation){
     SE_spline.create(x_array, k_array, SE_array, "Source_Pol_x_k");
   }
 
@@ -534,8 +534,8 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
   // For integration of perturbations in tight coupling regime (Only 2 photon multipoles + neutrinos needed)
   const int n_ell_theta_tc      = Constants.n_ell_theta_tc;
   const int n_ell_neutrinos_tc  = Constants.n_ell_neutrinos_tc;
-  const bool neutrinos          = Constants.neutrinos;
-  const bool polarization       = Constants.polarization;
+  const bool neutrinos          = SimParams.neutrinos;
+  const bool polarization       = SimParams.polarisation;
 
   // The different quantities in the y array
   const double &delta_cdm       =  y[Constants.ind_deltacdm_tc];
@@ -639,8 +639,8 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   const int n_ell_theta         = Constants.n_ell_theta;
   const int n_ell_thetap        = Constants.n_ell_thetap;
   const int n_ell_neutrinos     = Constants.n_ell_neutrinos;
-  const bool polarization       = Constants.polarization;
-  const bool neutrinos          = Constants.neutrinos;
+  const bool polarization       = SimParams.polarisation;
+  const bool neutrinos          = SimParams.neutrinos;
 
   // The different quantities in the y array
   const double &delta_cdm       =  y[Constants.ind_deltacdm];
@@ -842,11 +842,11 @@ void Perturbations::info() const{
   std::cout << "k_min (1/Mpc): " << k_min * Constants.Mpc  << "\n";
   std::cout << "k_max (1/Mpc): " << k_max * Constants.Mpc  << "\n";
   std::cout << "n_k:     " << n_k              << "\n";
-  if(Constants.polarization)
+  if(SimParams.polarisation)
     std::cout << "We include polarization\n";
   else
     std::cout << "We do not include polarization\n";
-  if(Constants.neutrinos)
+  if(SimParams.neutrinos)
     std::cout << "We include neutrinos\n";
   else
     std::cout << "We do not include neutrinos\n";
@@ -859,11 +859,11 @@ void Perturbations::info() const{
   std::cout << "ind_Phi:            " << Constants.ind_Phi              << "\n";
   std::cout << "ind_start_theta:    " << Constants.ind_start_theta      << "\n";
   std::cout << "n_ell_theta:        " << Constants.n_ell_theta          << "\n";
-  if(Constants.polarization){
+  if(SimParams.polarisation){
     std::cout << "ind_start_thetap:   " << Constants.ind_start_thetap   << "\n";
     std::cout << "n_ell_thetap:       " << Constants.n_ell_thetap       << "\n";
   }
-  if(Constants.neutrinos){
+  if(SimParams.neutrinos){
     std::cout << "ind_start_nu:       " << Constants.ind_start_nu       << "\n";
     std::cout << "n_ell_neutrinos     " << Constants.n_ell_neutrinos    << "\n";
   }
@@ -877,7 +877,7 @@ void Perturbations::info() const{
   std::cout << "ind_Phi:            " << Constants.ind_Phi_tc           << "\n";
   std::cout << "ind_start_theta:    " << Constants.ind_start_theta_tc   << "\n";
   std::cout << "n_ell_theta:        " << Constants.n_ell_theta_tc       << "\n";
-  if(Constants.neutrinos){
+  if(SimParams.neutrinos){
     std::cout << "ind_start_nu:       " << Constants.ind_start_nu_tc    << "\n";
     std::cout << "n_ell_neutrinos     " << Constants.n_ell_neutrinos_tc << "\n";
   }

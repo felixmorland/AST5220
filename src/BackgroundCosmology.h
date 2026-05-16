@@ -24,8 +24,8 @@ class BackgroundCosmology{
     double H0;                      // The Hubble parameter today H0 = 100h km/s/Mpc
 
     // Start and end of x-integration (can be changed)
-    double x_start = Constants.x_start;
-    double x_end   = Constants.x_end;
+    double x_start = SimParams.x_start;
+    double x_end   = SimParams.x_end;
 
     // Splines to be made
     Spline eta_of_x_spline{"eta"};

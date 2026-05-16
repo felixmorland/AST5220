@@ -39,7 +39,7 @@ void PowerSpectrum::solve(){
   auto cell_TT = solve_for_cell(thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
   cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
   
-  if (Constants.polarization) {
+  if (SimParams.polarisation) {
     auto cell_TE = solve_for_cell(thetaT_ell_of_k_spline, thetaE_ell_of_k_spline);
     cell_TE_spline.create(ells, cell_TE, "Cell_TE_of_ell");
 
@@ -172,7 +172,7 @@ void PowerSpectrum::line_of_sight_integration(){
   //============================================================================
   // Solve for ThetaE_ell(k) and spline
   //============================================================================
-  if(Constants.polarization){
+  if(SimParams.polarisation){
 
     // Make storage for the splines we are to create
     thetaE_ell_of_k_spline = std::vector<Spline>(nells);
@@ -297,7 +297,7 @@ void PowerSpectrum::output_CMB_spectrum(std::string filename) const{
     fp << ell                                 << " ";
     fp << cell_TT_spline( ell ) * normfactor  << " ";
 
-    if(Constants.polarization){
+    if(SimParams.polarisation){
       fp << cell_EE_spline( ell ) * normfactor_EE  << " ";
       fp << cell_TE_spline( ell ) * normfactor_TE  << " ";
     }

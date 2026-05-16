@@ -29,13 +29,13 @@ class PowerSpectrum {
 
     // The k-values we compute Theta_ell(k) etc. for
     const int n_k      = 100;
-    const double k_min = Constants.k_min;
-    const double k_max = Constants.k_max;
+    const double k_min = SimParams.k_min;
+    const double k_max = SimParams.k_max;
 
     // The x-values
     const int n_x        = 700;
-    const double x_start = Constants.x_start;
-    const double x_end   = Constants.x_end;
+    const double x_start = SimParams.x_start;
+    const double x_end   = SimParams.x_end;
     
     // The ells's we will compute Theta_ell and Cell for
     Vector ells{ 

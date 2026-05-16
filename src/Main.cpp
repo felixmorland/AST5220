@@ -9,34 +9,60 @@
 
 int main(int argc, char **argv){
   Utils::StartTiming("Everything");
-
-  //=========================================================================
+  //=======================================================================
   // Parameters
-  //=========================================================================
+  //=======================================================================
 
   // Background parameters
-  double h           = 0.67;
-  double OmegaCDM    = 0.267;
-  double OmegaK      = 0.0;
-  double OmegaB      = 0.05;
-  double Neff        = 3.046;
-  double TCMB        = 2.7255;
+  SimParams.h           = 0.67;
+  SimParams.OmegaCDM    = 0.267;
+  SimParams.OmegaK      = 0.0;
+  SimParams.OmegaB      = 0.05;
+  SimParams.Neff        = 3.046;
+  SimParams.TCMB        = 2.7255;
 
-  bool neutrinos     = true;
-  bool polarization  = true;
+  SimParams.neutrinos     = true;
+  SimParams.polarisation  = true;
 
   // Recombination parameters
-  double Yp          = 0.245;
-  bool reionisation  = true;
+  SimParams.Yp          = 0.245;
+  SimParams.reionisation  = true;
 
   // Power-spectrum parameters
-  double A_s         = 2.1e-9;
-  double n_s         = 0.965;
-  double kpivot_mpc  = 0.05;
+  SimParams.A_s         = 2.1e-9;
+  SimParams.n_s         = 0.965;
+  SimParams.kpivot_mpc  = 0.05;
+
+  // Min and max k-value
+  const double Mpc = 3.08567758e22;
+  SimParams.k_min = 0.00005 / Mpc;
+  SimParams.k_max = 1.0     / Mpc;
   
-  //=========================================================================
-  // Module I
-  //=========================================================================
+
+  // Min and max x-value
+  SimParams.x_start = log(1e-8);
+  SimParams.x_end   = 0.0;
+  
+  double h           = SimParams.h;
+  double OmegaCDM    = SimParams.OmegaCDM;
+  double OmegaK      = SimParams.OmegaK;
+  double OmegaB      = SimParams.OmegaB;
+  double Neff        = SimParams.Neff;
+  double TCMB        = SimParams.TCMB;
+  
+  double Yp          = SimParams.Yp;
+  bool reionisation  = SimParams.reionisation;
+  
+  bool neutrinos     = SimParams.neutrinos;
+  bool polarization  = SimParams.polarisation;
+  
+  double A_s         = SimParams.A_s;
+  double n_s         = SimParams.n_s;
+  double kpivot_mpc  = SimParams.kpivot_mpc;
+  
+  //=======================================================================
+  // Milestone I
+  //=======================================================================
 
   // Set up and solve the background
   BackgroundCosmology cosmo(h, OmegaB, OmegaCDM, OmegaK, Neff, TCMB);
@@ -49,9 +75,9 @@ int main(int argc, char **argv){
   // MCMC algorithm 
   //  mcmc_fit_to_supernova_data("data/supernovadata.txt", "results_supernovafitting.txt");
 
-  //=========================================================================
-  // Module II
-  //=========================================================================
+  //=======================================================================
+  // Milestone II
+  //=======================================================================
   
   // Solve the recombination history
   RecombinationHistory rec(&cosmo, Yp, reionisation);
@@ -61,9 +87,9 @@ int main(int argc, char **argv){
   // Output recombination quantities
   rec.output("recombination_data/recombination_He_reion.txt");
 
-  //=========================================================================
-  // Module III
-  //=========================================================================
+  //=======================================================================
+  // Milestone III
+  //=======================================================================
  
   // Solve the perturbations
   Perturbations pert(&cosmo, &rec);
@@ -81,9 +107,9 @@ int main(int argc, char **argv){
     pert.source_func_output(kvalue, source_func_filename);
   }
   
-  //=========================================================================
-  // Module IV
-  //=========================================================================
+  //=======================================================================
+  // Milestone IV
+  //=======================================================================
 
   PowerSpectrum power(&cosmo, &rec, &pert, A_s, n_s, kpivot_mpc);
   power.solve();
