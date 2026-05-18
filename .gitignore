@@ -2,7 +2,10 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,macos,c++,python
 
 figures/*
-results/*
+results/background/*
+results/recombination/*
+results/perturbations/*
+results/powerspectrum/*
 paper/*
 !paper/ast5220_paper.pdf
 
