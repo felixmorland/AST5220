@@ -36,6 +36,12 @@ void BackgroundCosmology::solve(){
 
   Vector x_array = Utils::linspace(xmin, xmax, npts);
   
+  std::cout << "\n";
+  std::cout << "/===========================\\\n";
+  std::cout << "|  I. BACKGROUND COSMOLOGY  |\n";
+  std::cout << "\\===========================/\n\n";
+
+  std::cout << "Solving...\n";
   // Solve for conformal time eta(x)
   Utils::StartTiming("Eta");
   // The ODE for deta/dx
@@ -237,8 +243,7 @@ void BackgroundCosmology::info() const{
   double x_LM_eq = log((OmegaB + OmegaCDM)/OmegaLambda)/3.;
   double x_acc = log((OmegaB + OmegaCDM)/(2.*OmegaLambda))/3.;
 
-  std::cout << "\n";
-  std::cout << "Info about cosmology class:\n";
+  std::cout << "\nParameters...\n";
   std::cout << "OmegaB:      " << OmegaB                                    << "\n";
   std::cout << "OmegaCDM:    " << OmegaCDM                                  << "\n";
   std::cout << "OmegaLambda: " << OmegaLambda                               << "\n";
@@ -251,20 +256,15 @@ void BackgroundCosmology::info() const{
   std::cout << "t0:          " << get_t_of_x(0) / Constants.Gyr             << "\n";
   std::cout << "eta0:        " << eta_of_x(0) / Constants.c / Constants.Gyr << "\n\n";
 
-  std::cout << "Matter-radiation equality"                                << "\n";
-  std::cout << "-------------------------"                                << "\n";
+  std::cout << "Events timeline...\n";
   std::cout << "x_MR_eq:     " << x_MR_eq                                 << "\n";
   std::cout << "t_MR_eq:     " << get_t_of_x(x_MR_eq) / Constants.Gyr     << "\n";
   std::cout << "z_MR_eq:     " << exp(-x_MR_eq) - 1.                      << "\n\n";
   
-  std::cout << "Onset of cosmic acceleration"                             << "\n";
-  std::cout << "----------------------------"                             << "\n";
   std::cout << "x_acc:       " << x_acc                                   << "\n";
   std::cout << "t_acc:       " << get_t_of_x(x_acc) / Constants.Gyr       << "\n";
   std::cout << "z_acc:       " << exp(-x_acc) - 1.                        << "\n\n";
 
-  std::cout << "Matter-dark energy equality"                              << "\n";
-  std::cout << "---------------------------"                              << "\n";
   std::cout << "x_LM_eq:     " << x_LM_eq                                 << "\n";
   std::cout << "t_LM_eq:     " << get_t_of_x(x_LM_eq) / Constants.Gyr     << "\n";
   std::cout << "z_LM_eq:     " << exp(-x_LM_eq) - 1.                      << "\n";

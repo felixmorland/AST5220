@@ -21,7 +21,10 @@ Perturbations::Perturbations(
 //====================================================
 
 void Perturbations::solve(){
-
+  std::cout << "\n\n";
+  std::cout << "/==========================\\\n";
+  std::cout << "|   III. PERTURBATIONS     |\n";
+  std::cout << "\\==========================/\n\n";
   // Integrate all the perturbation equation and spline the result
   integrate_perturbations();
 
@@ -30,19 +33,10 @@ void Perturbations::solve(){
   compute_source_functions(true, true, true, true);
 }
 
-//====================================================
-// The main work: integrate all the perturbations
-// and spline the results
-//====================================================
 
 void Perturbations::integrate_perturbations(){
   Utils::StartTiming("integrateperturbation");
 
-  //===================================================================
-  // TODO: Set up the k-array for the k's we are going to integrate over
-  // Start at k_min end at k_max with n_k points with either a
-  // quadratic or a logarithmic spacing
-  //===================================================================
   Vector k_array = exp(Utils::linspace(log(k_min), log(k_max), n_k));
   Vector x_array = Utils::linspace(x_start, x_end, n_x);
 
@@ -186,6 +180,7 @@ void Perturbations::integrate_perturbations(){
       }
     }
   }
+  Utils::progressbar(1.0);
   std::cout << "\n";
   Utils::EndTiming("integrateperturbation");
   
@@ -305,10 +300,6 @@ Vector Perturbations::set_ic(const double x, const double k) const{
   return y_tc;
 }
 
-//====================================================
-// Set IC for the full ODE system after tight coupling 
-// regime ends
-//====================================================
 
 Vector Perturbations::set_ic_after_tight_coupling(
     const Vector &y_tc, 
@@ -317,13 +308,6 @@ Vector Perturbations::set_ic_after_tight_coupling(
 
   // Make the vector we are going to fill
   Vector y(Constants.n_ell_tot_full);
-  
-  //=============================================================================
-  // Compute where in the y array each component belongs and where corresponding
-  // components are located in the y_tc array
-  // This is just an example of how to do it to make it easier
-  // Feel free to organize the component any way you like
-  //=============================================================================
 
   // Number of multipoles we have in the full regime
   const int n_ell_theta         = Constants.n_ell_theta;
@@ -402,7 +386,6 @@ Vector Perturbations::set_ic_after_tight_coupling(
       *(Nu+ell) = *(Nu_tc+ell);
     }
   }
-
   return y;
 }
 
@@ -491,14 +474,14 @@ void Perturbations::compute_source_functions(
                                   + Hp*g_tilde*dv_bdx) / (Constants.c * k) :
                                   0.0;
       
-      double Polarization_term  = Pol_on ?
+      double Polarisation_term  = Pol_on ?
                                   (3.0 / (4.0*pow(Constants.c*k, 2.0)))
                             * (dHpdx * (dHpdx*g_tilde*Pi + Hp*dgdx_tilde*Pi + Hp*g_tilde*dPidx)
                             + Hp * (ddHpddx*g_tilde*Pi + Hp*ddgddx_tilde*Pi + Hp*g_tilde*ddPiddx)
                             + 2.0*Hp * (dHpdx*dgdx_tilde*Pi + dHpdx*g_tilde*dPidx + Hp*dgdx_tilde*dPidx)) :
                                   0.0;
       
-      ST_array[index] = SW_term + ISW_term + Doppler_term + Polarization_term;
+      ST_array[index] = SW_term + ISW_term + Doppler_term + Polarisation_term;
 
       if(SimParams.polarisation){
         SE_array[index] = (x <= -2.5) ?
@@ -524,12 +507,6 @@ void Perturbations::compute_source_functions(
 
 // Derivatives in the tight coupling regime
 int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, double *dydx){
-
-  //=============================================================================
-  // Compute where in the y / dydx array each component belongs
-  // This is just an example of how to do it to make it easier
-  // Feel free to organize the component any way you like
-  //=============================================================================
   
   // For integration of perturbations in tight coupling regime (Only 2 photon multipoles + neutrinos needed)
   const int n_ell_theta_tc      = Constants.n_ell_theta_tc;
@@ -628,12 +605,6 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
 //====================================================
 
 int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dydx){
-  
-  //=============================================================================
-  // Compute where in the y / dydx array each component belongs
-  // This is just an example of how to do it to make it easier
-  // Feel free to organize the component any way you like
-  //=============================================================================
 
   // Index and number of the different quantities
   const int n_ell_theta         = Constants.n_ell_theta;
@@ -835,23 +806,23 @@ double Perturbations::get_horizon_enter(const double k) const{
 
 void Perturbations::info() const{
   std::cout << "\n";
-  std::cout << "Info about perturbations class:\n";
-  std::cout << "x_start:       " << x_start                << "\n";
-  std::cout << "x_end:         " << x_end                  << "\n";
-  std::cout << "n_x:     " << n_x              << "\n";
-  std::cout << "k_min (1/Mpc): " << k_min * Constants.Mpc  << "\n";
-  std::cout << "k_max (1/Mpc): " << k_max * Constants.Mpc  << "\n";
-  std::cout << "n_k:     " << n_k              << "\n";
+  std::cout << "Parameters...\n";
+  std::cout << "x_start:    " << x_start << "\n";
+  std::cout << "x_end:      " << x_end << "\n";
+  std::cout << "N_x:        " << n_x << "\n";
+  std::cout << "k_min:      " << k_min * Constants.Mpc << " / Mpc" << "\n";
+  std::cout << "k_max:      " << k_max * Constants.Mpc << " / Mpc" << "\n";
+  std::cout << "N_k:        " << n_k              << "\n";
   if(SimParams.polarisation)
-    std::cout << "We include polarization\n";
+    std::cout << "We include polarisation!\n";
   else
-    std::cout << "We do not include polarization\n";
+    std::cout << "We DO NOT include polarisation!\n";
   if(SimParams.neutrinos)
-    std::cout << "We include neutrinos\n";
+    std::cout << "We include neutrinos!\n";
   else
-    std::cout << "We do not include neutrinos\n";
+    std::cout << "We DO NOT include neutrinos!\n";
 
-  std::cout << "Information about the perturbation system:\n";
+  std::cout << "\nInformation about the perturbation system...\n";
   std::cout << "ind_deltacdm:       " << Constants.ind_deltacdm         << "\n";
   std::cout << "ind_deltab:         " << Constants.ind_deltab           << "\n";
   std::cout << "ind_v_cdm:          " << Constants.ind_vcdm             << "\n";
@@ -869,7 +840,7 @@ void Perturbations::info() const{
   }
   std::cout << "n_ell_tot_full:     " << Constants.n_ell_tot_full       << "\n";
 
-  std::cout << "Information about the perturbation system in tight coupling:\n";
+  std::cout << "\nInformation about TIGHT COUPLING system...\n";
   std::cout << "ind_deltacdm:       " << Constants.ind_deltacdm_tc      << "\n";
   std::cout << "ind_deltab:         " << Constants.ind_deltab_tc        << "\n";
   std::cout << "ind_v_cdm:          " << Constants.ind_vcdm_tc          << "\n";
@@ -882,7 +853,6 @@ void Perturbations::info() const{
     std::cout << "n_ell_neutrinos     " << Constants.n_ell_neutrinos_tc << "\n";
   }
   std::cout << "n_ell_tot_tc:       " << Constants.n_ell_tot_tc         << "\n";
-  std::cout << std::endl;
 }
 
 //====================================================

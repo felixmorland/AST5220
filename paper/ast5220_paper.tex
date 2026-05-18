@@ -36,7 +36,7 @@
              }
    \date{}
 
-  \abstract{We build a numerical Einstein-Boltzmann code from scratch, heavily inspired by the guide written by \cite{callin2006} and the lectures by \cite{winther_lectures}. It had the goal of simulating cosmic structure formation in a flat $\Lambda$CDM universe and computing the CMB and matter power spectra from first principles. The code was developped as a project in the course AST5220 at the University of Oslo during the Spring semester 2026. It solves the coupled Boltzmann hierarchies for cold dark matter, baryons, photons, and massless neutrinos from adiabatic inflationary initial conditions, using a tight-coupling approximation to stabilise the integration through the stiff pre-recombination epoch and the line-of-sight integral of \citet{LOS_integration} to recover the photon transfer functions at high multipoles. The recombination history is computed through the Saha and Peebles regimes with helium and reionisation included, giving a sound horizon at decoupling of $r_s \simeq 144.413\,\text{Mpc}$. The predicted CMB temperature, E-mode polarisation, and cross power spectra, as well as the matter power spectrum, are found to be in excellent agreement with observations from Planck 2018 \citep{planck2020}, SDSS, and the Ly$\alpha$ forest.}
+  \abstract{We build a numerical Einstein-Boltzmann code from scratch, heavily inspired by the guide written by \cite{callin2006} and the lectures by \cite{winther_lectures}. The program simulates cosmic structure formation in a flat $\Lambda$CDM universe and computes the CMB and matter power spectra from first principles. The code was developped as a project in the course AST5220 at the University of Oslo during the Spring semester 2026. It solves the coupled Boltzmann hierarchies for cold dark matter, baryons, photons, and massless neutrinos from adiabatic inflationary initial conditions, using a tight-coupling approximation to stabilise the integration through the stiff pre-recombination epoch and the line-of-sight integral of \citet{LOS_integration} to recover the photon transfer functions at high multipoles. The recombination history is computed through the Saha and Peebles regimes with helium and reionisation included, giving a sound horizon at decoupling of $r_s \simeq 144.413\,\text{Mpc}$. The predicted CMB temperature, E-mode polarisation, and cross power spectra, as well as the matter power spectrum, are found to be in excellent agreement with observations from Planck 2018 \citep{planck2020}, SDSS, and the Ly$\alpha$ forest observations.}
 
    \keywords{   
       cosmology --
@@ -54,9 +54,9 @@
 
 The cosmic microwave background (CMB) is the radiation released at recombination, when the Universe had cooled sufficiently for electrons and protons to combine into neutral hydrogen and the photons decoupled from the baryon plasma. The resulting temperature field is nearly uniform at $T_\text{CMB0} \simeq 2.7255\,\text{K}$ today, but features tiny fluctuations of order $\delta T/T \sim 10^{-5}$, visible in the WMAP full-sky map in Figure~\ref{fig:WMAP}. These perturbations encode the initial conditions set by inflation and the subsequent evolution of the photon-baryon plasma, making the CMB angular power spectrum one of the most powerful probes of cosmological parameters.
 
-The large-scale structure of the Universe shares the same origin. Primordial perturbations seeded during inflation were amplified by gravity, and the acoustic oscillations of the photon-baryon plasma left coherent imprints on both the CMB and the matter distribution. Computing these observables from first principles therefore requires evolving a set of 29 coupled perturbation equations for all species from deep in the radiation-dominated era to the present day.
+The large-scale structure of the Universe shares the same origin. Primordial perturbations seeded during inflation were amplified by gravity, and the acoustic oscillations of the photon-baryon plasma left coherent imprints on both the CMB and the matter distribution. Computing these observables from first principles therefore requires evolving a set of coupled perturbation equations for all species from deep in the radiation-dominated era to the present day.
 
-In this project we build a numerical Einstein-Boltzmann code heavily based on the guide written by \cite{callin2006} and the curriculum in the course AST5220 teached by Hans A. Winther at the University of Oslo \citep{winther_lectures}. The model simulates cosmic structure formation in a flat $\Lambda$CDM universe with Planck 2018 fiducial parameters \citep{planck2020}, including cold dark matter, baryons, photons, massless neutrinos, and a cosmological constant. We first establish the background cosmology, then compute the recombination history, before evolving the full perturbation hierarchy using the tight-coupling approximation and the line-of-sight integral of \citet{LOS_integration} to efficiently recover the high-$\ell$ transfer functions. Finally, we compute the CMB temperature, polarisation, and cross power spectra as well as the matter power spectrum, and compare our predictions to observational data.
+In this project we build a numerical Einstein-Boltzmann code heavily based on the guide written by \cite{callin2006} and the curriculum in the course AST5220 teached by Hans A. Winther at the University of Oslo \citep{winther_lectures}. The model simulates cosmic structure formation in a flat $\Lambda$CDM universe with Planck 2018 fiducial parameters \citep{planck2020}, including cold dark matter, baryons, photons, massless neutrinos, and a cosmological constant. We first establish the background cosmology, then compute the recombination history, before evolving the full perturbation hierarchy using the tight-coupling approximation and the line-of-sight integral of \citet{LOS_integration} to efficiently recover the high-$\ell$ multipoles. Finally, we compute the CMB temperature, polarisation, and cross power spectra as well as the matter power spectrum, and compare our predictions to observational data.
 
 \begin{figure}
       \centering
@@ -66,19 +66,11 @@ In this project we build a numerical Einstein-Boltzmann code heavily based on th
 \end{figure}
 
 \section{Background cosmology}
-To compute the CMB power spectrum, we must first establish the background cosmological model upon which perturbations will evolve. This section details the construction of this background Universe. We begin by outlining the theoretical framework, most notably the Friedmann-Lemaître-Robertson-Walker (FLRW) metric and the resulting Friedmann equations that governs the expansion history and the evolution of its energy components. Subsequently, we describe the numerical implementation of this model, including the fiducial parameters adopted from Planck 2018. Finally, we validate our implementation by comparing its predicted timeline of cosmic epochs and derived quantities, such as the age of the universe, against theoretical expectations, and we present the results of an MCMC parameter fit to supernova data, which contextualizes the well-known Hubble tension within our model.
+To compute the CMB power spectrum, we must first establish the background cosmological model upon which perturbations will evolve. This section details the construction of this background Universe. We begin by outlining the theoretical framework, most notably the Friedmann-Lemaître-Robertson-Walker (FLRW) metric and the resulting Friedmann equations that governs the expansion history and the evolution of its energy components. Subsequently, we describe the numerical implementation of this model, including the fiducial parameters adopted from Planck 2018. Finally, we validate our implementation by comparing its predicted timeline of cosmic epochs and derived quantities, such as the age of the universe, against theoretical expectations, and we present the results of an MCMC parameter fit to supernova data, which contextualises the well-known Hubble tension within our model.
 
 
 \subsection{Theory}
-% \todo[inline, color=red]{
-%       Einstein field eqs.\\
-%       FLRW metric and the Friedmann eqs.\\
-%       Hubble function\\
-%       Evolution of density parameters\\
-%       Cosmic time\\
-%       Conformal time\\
-%       Luminosity distance
-% }
+
 In this section, we will present the relevant theory for developping the background cosmology in our model Universe along with all of the equations used. All of the theory is covered in greater detail in the lecture notes by Hans A. Winther for the cosmology course AST5220 \citep{winther_lectures, winther_milestone1}, so we will simply summarise the key details and derive some quantities that will come in handy for the numerical implementation.
 
 \subsubsection{The Friedmann-Lemaître-Robertson-Walker geometry}
@@ -1004,7 +996,7 @@ In order to qualitatively compare our simulated CMB with observations, we produc
 \begin{figure*}
       \centering
       \includegraphics[width=0.7\linewidth]{../figures/simulated_CMB_map.pdf}
-      \caption{CMB map produced from the simulated power spectrum. Generated using the Python library \texttt{healpy} \citep{healpy1,healpy2}.}
+      \caption{CMB map produced from the simulated power spectrum. Generated using the Python library \texttt{healpy} \citep{healpy1,healpy2}. Colourmap taken from \cite{CMB_cmap}.}
       \label{fig:CMB map sim}
 \end{figure*}
 

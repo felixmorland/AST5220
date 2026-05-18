@@ -8,6 +8,7 @@
 #include <map>
 #include <gsl/gsl_sf_bessel.h>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #ifdef _COMPLEX_BESSEL
 #include <complex_bessel.h>
@@ -112,6 +113,7 @@ extern struct ConstantsAndUnits {
 namespace Utils {
   
   void progressbar(double progress);
+  void print_startup();
   std::string format_k(double k);
   // Find the x-value such that y(x) = y_value
   double binary_search_for_value(

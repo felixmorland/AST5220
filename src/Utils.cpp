@@ -59,6 +59,25 @@ namespace Utils{
       std::cout << "] " << int(progress * 100.0) << " %\r";
       std::cout.flush();
   }
+  /**
+  * @brief Print start up message
+  */
+  void print_startup(){
+      std::cout << R"(⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⠠⠀⣤⢤⣿⠀⠀⢀⣀⣀⠀⠀⠀⠀
+⠀⠀⠀⠀⠺⠂⢦⡹⣄⣿⡷⢶⣫⠀⡜⠀⠆⠀⠀ EINSTEIN-BOLTZMANN SOLVER
+⠀⠀⠀⠀⠀⠀⠈⣻⡾⠟⢷⣿⢳⣾⠀⠀⠀⠀⠀ =========================
+⠐⠒⠚⠻⠿⠿⢿⣿⡀⠀⢀⣽⡿⠿⢿⡟⠒⠒⠂ Felix Morland
+⠀⠀⠀⠀⢀⡼⢡⡿⢻⣿⡟⢿⣍⠲⠤⠇⠀⠀⠀ MSc Astrophysics @ UiO
+⠀⠀⠀⠀⣾⣅⡫⠖⠉⣿⠃⠀⠈⠂⠀⠀⠀⠀⠀ Spring 2026
+⠀⠀⠀⠀⠉⠁⠀⠀⠀⢻⠀⢺⠆⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⡀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+)" << std::endl;
+  std::cout << "Template developped by Hans A. Winther.\nhttps://cmb.wintherscoming.no\n";
+  }
+
   // Lambda to format k value with minimal decimals
   std::string format_k(double k) {
     std::stringstream ss;

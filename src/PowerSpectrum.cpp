@@ -23,19 +23,18 @@ PowerSpectrum::PowerSpectrum(
 // Do all the solving
 //====================================================
 void PowerSpectrum::solve(){
+  std::cout << "\n\n";
+  std::cout << "/===========================\\\n";
+  std::cout << "|    IV. POWER SPECTRUM     |\n";
+  std::cout << "\\===========================/\n\n";
 
+  // Spline Bessel functions
   generate_bessel_function_splines();
 
-  //=========================================================================
-  // TODO: Line of sight integration to get Theta_ell(k)
-  // Implement line_of_sight_integration
-  //=========================================================================
+  // Line of sight integration to get Theta_ell(k)
   line_of_sight_integration();
 
-  //=========================================================================
-  // TODO: Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
-  // Implement solve_for_cell
-  //=========================================================================
+  // Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
   auto cell_TT = solve_for_cell(thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
   cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
   
@@ -81,6 +80,7 @@ void PowerSpectrum::generate_bessel_function_splines(){
     // Make the j_ell_splines[i] spline
     j_ell_splines[i].create(z_array, j_ell_sample, "j_" + std::to_string(ell) + "_spline");
   }
+  Utils::progressbar(1.0);
   std::cout << "\n";
   Utils::EndTiming("besselspline");
 }
@@ -127,6 +127,7 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
       result[ell][ik] = integral[ell]*dx;
     }
   }
+  Utils::progressbar(1.0);
   std::cout << "\n";
   Utils::EndTiming(func_name);
   return result;
@@ -138,9 +139,7 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
 void PowerSpectrum::line_of_sight_integration(){
   const int nells = ells.size();
   
-  //============================================================================
-  // Make linear spaced k-array with dk ~ 2pi/eta0/N where N >~ 6
-  //============================================================================
+  // Make linear spaced k-array 
   const double eta0 = cosmo->eta_of_x(0.0);
   const double dk   = M_PI / (4.0*eta0);
   const int n_k_int = int((k_max - k_min) / dk);
@@ -150,10 +149,6 @@ void PowerSpectrum::line_of_sight_integration(){
 
   // Make storage for the splines we are to create
   thetaT_ell_of_k_spline      = std::vector<Spline>(nells);
-
-  //============================================================================
-  // Solve for Theta_ell(k) and spline the result
-  //============================================================================
 
   // Make a function returning the source function
   std::function<double(double,double)> source_function_T = [&](double x, double k){
@@ -169,9 +164,6 @@ void PowerSpectrum::line_of_sight_integration(){
     thetaT_ell_of_k_spline[i].create(k_array, thetaT_ell_of_k[i], "thetaT_ell_of_k_spline_ell=" + std::to_string(ells[i]));
   }
 
-  //============================================================================
-  // Solve for ThetaE_ell(k) and spline
-  //============================================================================
   if(SimParams.polarisation){
 
     // Make storage for the splines we are to create
@@ -211,10 +203,10 @@ Vector PowerSpectrum::solve_for_cell(
   double dlog_k         = log_k_array[1] - log_k_array[0];
   Vector result(nells);
 
-  //============================================================================
+  //================================================================
   // Integrate Cell = Int 4 * pi * P(k) f_ell g_ell dlog_k
   // Trapezoidal rule
-  //============================================================================
+  //================================================================
   for (int i = 0; i < nells; i++) {
     int ell = ells[i];
     double integral = 0.0;

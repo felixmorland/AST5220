@@ -17,7 +17,11 @@ RecombinationHistory::RecombinationHistory(
 //====================================================
 
 void RecombinationHistory::solve(){
-    
+  std::cout << "\n\n";
+  std::cout << "/=============================\\\n";
+  std::cout << "|  II. RECOMBINATION HISTORY  |\n";
+  std::cout << "\\=============================/\n\n";
+  std::cout << "Solving...";
   // Compute and spline Xe, ne
   solve_number_density_electrons();
    
@@ -57,10 +61,8 @@ void RecombinationHistory::solve_number_density_electrons(){
   const double OmegaB0      = cosmo->get_OmegaB();       
   const double rho_crit0    = 3.0 * H0*H0 / (8.0*M_PI*Constants.G);
 
-  std::cout << "Calculating Xe and ne...\n";
   int switch_idx = npts_rec_arrays;
   for(int i = 0; i < npts_rec_arrays; i++){
-    Utils::progressbar(double(i) / double(npts_rec_arrays));
 
     auto Xe_ne_data_H = electron_fraction_from_saha_equation(x_array[i]);
     Xe_saha_arr[i] = Xe_ne_data_H.first;
@@ -444,33 +446,31 @@ void RecombinationHistory::info() const{
   double x_dec_saha = Utils::binary_search_for_value(tau_saha_of_x_spline, 1.0);
 
   std::cout << "\n";
-  std::cout << "Info about recombination/reionization history class:\n";
-  std::cout << "Yp:                          " << Yp                                << "\n";
-  std::cout << "Reionisation:                " << std::boolalpha << reionisation    << "\n\n";
+  std::cout << "Parameters...\n";
+  std::cout << "Yp:                             " << Yp << "\n";
+  std::cout << "Reionisation:                   " << std::boolalpha << reionisation    << "\n\n";
 
-  std::cout << "Decoupling\n-------------------------------------\n";
-  std::cout << "x_dec:                 " << x_dec                                        << "\n";
-  std::cout << "z_dec:                 " << exp(-x_dec) - 1.0                            << "\n";
-  std::cout << "t_dec:                 " << cosmo->get_t_of_x(x_dec) / Constants.Gyr     << "\n\n";
+  std::cout << "Full solution Peebles and Saha...\n";
+  std::cout << "x_dec:                          " << x_dec << "\n";
+  std::cout << "z_dec:                          " << exp(-x_dec) - 1.0 << "\n";
+  std::cout << "t_dec:                          " << cosmo->get_t_of_x(x_dec) / Constants.Gyr << "\n";
 
-  std::cout << "Recombination\n-------------------------------------\n";
-  std::cout << "x_rec:                " << x_rec                                         << "\n";
-  std::cout << "z_rec:                " << exp(-x_rec) - 1.0                             << "\n";
-  std::cout << "t_rec:                " << cosmo->get_t_of_x(x_rec) / Constants.Gyr      << "\n\n";
+  std::cout << "x_rec:                          " << x_rec << "\n";
+  std::cout << "z_rec:                          " << exp(-x_rec) - 1.0 << "\n";
+  std::cout << "t_rec:                          " << cosmo->get_t_of_x(x_rec) / Constants.Gyr << "\n\n";
 
-  std::cout << "Decoupling (SAHA)\n-------------------------------------\n";
-  std::cout << "x_dec_saha:           " << x_dec_saha                                    << "\n";
-  std::cout << "z_dec_saha:           " << exp(-x_dec_saha) - 1.0                        << "\n";
-  std::cout << "t_dec_saha:           " << cosmo->get_t_of_x(x_dec_saha) / Constants.Gyr << "\n\n";
+  std::cout << "Pure Saha solution...\n";
+  std::cout << "x_dec_saha:                     " << x_dec_saha << "\n";
+  std::cout << "z_dec_saha:                     " << exp(-x_dec_saha) - 1.0 << "\n";
+  std::cout << "t_dec_saha:                     " << cosmo->get_t_of_x(x_dec_saha) / Constants.Gyr << "\n";
 
-  std::cout << "Recombination (SAHA)\n-------------------------------------\n";
-  std::cout << "x_rec_saha:           " << x_rec_saha                                    << "\n";
-  std::cout << "z_rec_saha:           " << exp(-x_rec_saha) - 1.0                        << "\n";
-  std::cout << "t_rec_saha:           " << cosmo->get_t_of_x(x_rec_saha) / Constants.Gyr << "\n\n";
+  std::cout << "x_rec_saha:                     " << x_rec_saha << "\n";
+  std::cout << "z_rec_saha:                     " << exp(-x_rec_saha) - 1.0 << "\n";
+  std::cout << "t_rec_saha:                     " << cosmo->get_t_of_x(x_rec_saha) / Constants.Gyr << "\n\n";
 
-  std::cout << "Sound horizon at decoupling: " << get_sound_horizon(x_dec)/Constants.Mpc << "\n";
-  std::cout << "Freeze-out Xe(0):            " << Xe_of_x(0)                             << "\n";
-  std::cout << "Integral of g_tilde:         " << g_tilde_of_x_spline.eval_integ(x_start, x_end) << "\n";
+  std::cout << "Sound horizon at decoupling:    " << get_sound_horizon(x_dec)/Constants.Mpc << "\n";
+  std::cout << "Freeze-out Xe(0):               " << Xe_of_x(0) << "\n";
+  std::cout << "Integral of g_tilde:            " << g_tilde_of_x_spline.eval_integ(x_start, x_end) << "\n";
   std::cout << std::endl;
 } 
 
