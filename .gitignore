@@ -2,12 +2,24 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,macos,c++,python
 
 figures/*
+!figures/.gitkeep
+
 results/background/*
+!results/background/.gitkeep
+
 results/recombination/*
+!results/recombination/.gitkeep
+
 results/perturbations/*
+!results/perturbations/.gitkeep
+
 results/powerspectrum/*
+!results/powerspectrum/.gitkeep
+
 paper/*
 !paper/ast5220_paper.pdf
+
+cmb
 
 ### C++ ###
 # Prerequisites
