@@ -3,6 +3,8 @@
 
 figures/*
 !figures/.gitkeep
+!figures/CMB_power_spectrum.pdf
+!figures/matter_power_spectrum.pdf
 
 results/background/*
 !results/background/.gitkeep
