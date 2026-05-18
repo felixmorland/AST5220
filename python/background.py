@@ -62,7 +62,7 @@ if len(OmegaM[twosigma]) > 2:
     # Plot filled region for 2-sigma
     ax.fill(points_2sigma[hull_2sigma.vertices, 0], 
             points_2sigma[hull_2sigma.vertices, 1],
-            color=col['blue'], alpha=0.3, label=r'$2\sigma$ constraint')
+            color=col['light blue'], alpha=0.5, label=r'$2\sigma$ constraint')
 
 if len(OmegaM[onesigma]) > 2:
     points_1sigma = np.column_stack([OmegaM[onesigma], OmegaLambda[onesigma]])
@@ -71,7 +71,7 @@ if len(OmegaM[onesigma]) > 2:
     # Plot filled region for 1-sigma
     ax.fill(points_1sigma[hull_1sigma.vertices, 0], 
             points_1sigma[hull_1sigma.vertices, 1],
-            color=col['red'], alpha=0.7, label=r'$1\sigma$ constraint')
+            color=col['red'], alpha=1, label=r'$1\sigma$ constraint')
 
 x = np.linspace(-1,1,100)
 ax.plot(x, 1-x, linestyle='--', color='black', label='Flat Universe')

@@ -1,9 +1,5 @@
 #include"RecombinationHistory.h"
 
-//====================================================
-// Constructors
-//====================================================
-   
 RecombinationHistory::RecombinationHistory(
     BackgroundCosmology *cosmo, 
     double Yp, bool reionisation) :
@@ -12,11 +8,12 @@ RecombinationHistory::RecombinationHistory(
   reionisation(reionisation)
 {}
 
-//====================================================
-// Do all the solving we need to do
-//====================================================
-
+/**
+ * @brief Solve the recombination history
+ */
 void RecombinationHistory::solve(){
+
+  // Indicate new milestone
   std::cout << "\n\n";
   std::cout << "/=============================\\\n";
   std::cout << "|  II. RECOMBINATION HISTORY  |\n";
@@ -32,9 +29,9 @@ void RecombinationHistory::solve(){
   solve_for_sound_horizon();
 }
 
-// ====================================================
-// Solve for X_e and n_e using Saha and Peebles and spline the result
-// ====================================================
+/**
+ * @brief Compute and spline Xe, ne
+ */
 void RecombinationHistory::solve_number_density_electrons(){
 
   Utils::StartTiming("Xe");
@@ -153,9 +150,11 @@ void RecombinationHistory::solve_number_density_electrons(){
 
 
 
-//====================================================
-// Solve the Saha equation to get ne and Xe
-//====================================================
+/**
+ * @brief Solve the Saha equation to get Xe, ne
+ * @param x log-scale factor
+ * @return pair (Xe(x), ne(x))
+ */
 std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equation(double x) const{
   const double a           = exp(x);
  
@@ -190,9 +189,11 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   return std::pair<double,double>(Xe, ne);
 }
 
-//====================================================
-// Solve the Saha equation WITH HELIUM to get ne and Xe
-//====================================================
+/**
+ * @brief Solve the Saha equation WITH HELIUM to get Xe, ne
+ * @param x log-scale factor
+ * @return pair (Xe(x), ne(x))
+ */
 std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equation_with_He(double x) const{
   const double a           = exp(x);
  
@@ -226,9 +227,6 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   double r2 =       A_base * exp(-epsilon_0       / (k_b*Tb)) / nb;  // H -> H+
 
   // Ion fractions as functions of fe
-  // He+ = r0/fe / (1 + r0/fe + r0*r1/fe^2)
-  // He2+ = (r1/fe) * He+
-  // H+  = r2/fe / (1 + r2/fe)  =  r2 / (fe + r2)
   double fe = 1.0;
   for (int iter = 0; iter < 200; iter++) {
       double fe2    = fe * fe;
@@ -250,9 +248,9 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   return std::pair<double,double>(Xe, ne);
 }
 
-//====================================================
-// The right hand side of the dXedx Peebles ODE
-//====================================================
+/**
+ * @brief Right hand side of the Peebles ODE
+ */
 int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dXedx){
 
   // Current value of a and X_e
@@ -304,11 +302,9 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   return GSL_SUCCESS;
 }
 
-//====================================================
-// Solve for the optical depth tau, compute the 
-// visibility function and spline the result
-//====================================================
-
+/**
+ * @brief Solve for the optical depth tau(x)
+ */
 void RecombinationHistory::solve_for_optical_depth_tau(){
   Utils::StartTiming("opticaldepth");
 
@@ -349,6 +345,9 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   Utils::EndTiming("opticaldepth");
 }
 
+/**
+ * @brief Compute the sound horizon in the photon-baryon plasma
+ */
 void RecombinationHistory::solve_for_sound_horizon(){
   Utils::StartTiming("soundhorizon");
 
@@ -382,61 +381,116 @@ void RecombinationHistory::solve_for_sound_horizon(){
   sound_horizon_spline.create(x_array, sound_horizon_array, "Spline sound horizon");
 }
 
-//====================================================
-// Get methods
-//====================================================
-
+/**
+ * @brief Returns the optical depth tau at the given log scale factor x.
+ * @param x Log scale factor x = log(a).
+ * @return Optical depth tau(x).
+ */
 double RecombinationHistory::tau_of_x(double x) const{
   return tau_of_x_spline(x);
 }
 
+/**
+ * @brief Returns the first derivative of the optical depth with respect to x.
+ * @param x Log scale factor x = log(a).
+ * @return dtau/dx evaluated at x.
+ */
 double RecombinationHistory::dtaudx_of_x(double x) const{
   return dtaudx_of_x_spline(x);
 }
 
+/**
+ * @brief Returns the second derivative of the optical depth with respect to x.
+ * @param x Log scale factor x = log(a).
+ * @return d^2tau/dx^2 evaluated at x.
+ */
 double RecombinationHistory::ddtauddx_of_x(double x) const{
-return dtaudx_of_x_spline.deriv_x(x);
+  return dtaudx_of_x_spline.deriv_x(x);
 }
 
+/**
+ * @brief Returns the visibility function g_tilde at the given log scale factor x.
+ * @param x Log scale factor x = log(a).
+ * @return Visibility function g_tilde(x).
+ */
 double RecombinationHistory::g_tilde_of_x(double x) const{
   return g_tilde_of_x_spline(x);
 }
 
+/**
+ * @brief Returns the first derivative of the visibility function with respect to x.
+ * @param x Log scale factor x = log(a).
+ * @return dg_tilde/dx evaluated at x.
+ */
 double RecombinationHistory::dgdx_tilde_of_x(double x) const{
   return g_tilde_of_x_spline.deriv_x(x);
 }
 
+/**
+ * @brief Returns the second derivative of the visibility function with respect to x.
+ * @param x Log scale factor x = log(a).
+ * @return d²g_tilde/dx² evaluated at x.
+ */
 double RecombinationHistory::ddgddx_tilde_of_x(double x) const{
   return g_tilde_of_x_spline.deriv_xx(x);
 }
 
+/**
+ * @brief Returns the free electron fraction Xe at the given log-scale factor x.
+ * @param x Log scale factor x = log(a).
+ * @return Electron fraction Xe(x) = ne/nH.
+ */
 double RecombinationHistory::Xe_of_x(double x) const{
   return exp(log_Xe_of_x_spline(x));
 }
 
+/**
+ * @brief Returns the free electron number density ne at the given log scale factor x.
+ * @param x Log scale factor x = log(a).
+ * @return Free electron number density ne(x) in physical units.
+ */
 double RecombinationHistory::ne_of_x(double x) const{
   return exp(log_ne_of_x_spline(x));
 }
 
+/**
+ * @brief Returns the free electron number density as predicted by the Saha equation.
+ * @param x Log scale factor x = log(a).
+ * @return Saha-approximated free electron number density ne(x).
+ */
 double RecombinationHistory::ne_saha_of_x(double x) const{
   return exp(log_ne_saha_of_x_spline(x));
 }
 
+/**
+ * @brief Returns the sound horizon at the given log scale factor x.
+ * @param x Log scale factor x = log(a).
+ * @return Comoving sound horizon rs(x) in meters.
+ */
 double RecombinationHistory::get_sound_horizon(double x) const{
   return sound_horizon_spline(x);
 }
 
+/**
+ * @brief Returns the primordial helium mass fraction Yp.
+ * @return Helium mass fraction Yp.
+ */
 double RecombinationHistory::get_Yp() const{
   return Yp;
 }
 
+/**
+ * @brief Returns the log scale factor x at recombination, defined as
+ *        where the free electron fraction Xe drops to 0.1.
+ * @return Log scale factor x_rec at recombination.
+ */
 double RecombinationHistory::get_x_rec() const{
   return Utils::binary_search_for_value(log_Xe_of_x_spline, log(0.1));
 }
 
-//====================================================
-// Print some useful info about the class
-//====================================================
+/**
+ * @brief Print information about RecombinationHistory class
+ */
 void RecombinationHistory::info() const{
   // Peebles
   double x_rec = Utils::binary_search_for_value(log_Xe_of_x_spline, log(0.1));
@@ -474,9 +528,10 @@ void RecombinationHistory::info() const{
   std::cout << std::endl;
 } 
 
-//====================================================
-// Output the data computed to file
-//====================================================
+/**
+ * @brief Output results to file
+ * @param filename location of outfile
+ */
 void RecombinationHistory::output(const std::string filename) const{
   std::ofstream fp(filename.c_str());
   const int npts       = 2000;

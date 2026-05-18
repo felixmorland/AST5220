@@ -118,7 +118,7 @@ int main(int argc, char **argv){
   power.output_CMB_spectrum("results/powerspectrum/cells.txt");
   power.output_matter_power_spectrum("results/powerspectrum/matter_ps.txt");
   power.output_transfer_func("results/powerspectrum/transfer_funcT.txt", power.get_thetaT_ell_of_k_spline());
-  power.output_transfer_func("results/powerspectrum/transfer_funcE.txt", power.get_thetaE_ell_of_k_spline());
+
 
   std::cout << "\n";
   Utils::EndTiming("Everything");

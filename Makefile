@@ -49,10 +49,6 @@ BackgroundCosmology.o   : BackgroundCosmology.h Utils.h Spline.h ODESolver.h
 RecombinationHistory.o  : RecombinationHistory.h BackgroundCosmology.h
 Perturbations.o         : Perturbations.h BackgroundCosmology.h RecombinationHistory.h
 PowerSpectrum.o         : PowerSpectrum.h BackgroundCosmology.h RecombinationHistory.h Perturbations.h
-Examples.o              : Utils.h Spline.h ODESolver.h
-
-examples: Examples.o Utils.o Spline.o ODESolver.o
-	${CC} -o $@ $^ $C $(INC) $(LIBS)
 
 cmb: $(OBJS)
 	${CC} -o $@ $^ $C $(INC) $(LIBS)

@@ -1,9 +1,5 @@
 #include"PowerSpectrum.h"
 
-//====================================================
-// Constructors
-//====================================================
-
 PowerSpectrum::PowerSpectrum(
     BackgroundCosmology *cosmo, 
     RecombinationHistory *rec, 
@@ -19,10 +15,11 @@ PowerSpectrum::PowerSpectrum(
   kpivot_mpc(kpivot_mpc)
 {}
 
-//====================================================
-// Do all the solving
-//====================================================
+/**
+ * @brief Solve everything needed for the power spectra
+ */
 void PowerSpectrum::solve(){
+  // Introduce new milestone
   std::cout << "\n\n";
   std::cout << "/===========================\\\n";
   std::cout << "|    IV. POWER SPECTRUM     |\n";
@@ -47,19 +44,15 @@ void PowerSpectrum::solve(){
   }
 }
 
-//====================================================
-// Generate splines of j_ell(z) needed for LOS integration
-//====================================================
-
+/**
+ * @brief Spline Bessel functions to speed up LOS integral
+ */
 void PowerSpectrum::generate_bessel_function_splines(){
   Utils::StartTiming("besselspline");
   
   // Make storage for the splines
   j_ell_splines = std::vector<Spline>(ells.size());
-    
-  //=================================================================
-  // Compute splines for bessel functions j_ell(z)
-  //=================================================================
+
   const double z_max   = k_max * cosmo->eta_of_x(0.0);
   const double delta_z = M_PI / 8.0;
   const int n_z        = int(z_max / delta_z);
@@ -85,11 +78,13 @@ void PowerSpectrum::generate_bessel_function_splines(){
   Utils::EndTiming("besselspline");
 }
 
-//====================================================
-// Do the line of sight integration for a single
-// source function
-//====================================================
-
+/**
+ * @brief Line-of-sight integral for a single multipole ell
+ * @param k_array vector containing the wavenumbers to integrate over
+ * @param x_array vector containing the x-values to integrate over
+ * @param source_function source function, either S tilde or S_E
+ * @param func_name name of source function
+ */
 Vector2D PowerSpectrum::line_of_sight_integration_single(
     Vector & k_array,
     Vector & x_array,
@@ -133,9 +128,9 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
   return result;
 }
 
-//====================================================
-// Do the line of sight integration
-//====================================================
+/**
+ * @brief Perform the LOS integration for all multipoles
+ */
 void PowerSpectrum::line_of_sight_integration(){
   const int nells = ells.size();
   
@@ -190,6 +185,13 @@ void PowerSpectrum::line_of_sight_integration(){
 // Compute Cell (could be TT or TE or EE) 
 // Cell = Int_0^inf 4 * pi * P(k) f_ell g_ell dk/k
 //====================================================
+/**
+ * @brief Compute CMB power spectrum
+ * @param f_ell_spline, g_ell_spline transfer function spline
+ * @details Compute Cell (could be TT or TE or EE) 
+ * Cell = Int_0^inf 4 * pi * P(k) f_ell g_ell dk/k
+ * Uses trapezoidal integration.
+ */
 Vector PowerSpectrum::solve_for_cell(
     std::vector<Spline> & f_ell_spline,
     std::vector<Spline> & g_ell_spline
@@ -229,18 +231,20 @@ Vector PowerSpectrum::solve_for_cell(
   return result;
 }
 
-//====================================================
-// The primordial power-spectrum
-//====================================================
-
+/**
+ * @brief Primordial power spectrum
+ * @param k wavenumber to evaluate the spectrum at
+ * @return P_prim(k)
+ */
 double PowerSpectrum::primordial_power_spectrum(const double k) const{
   return A_s * pow( Constants.Mpc * k / kpivot_mpc , n_s - 1.0);
 }
 
-//====================================================
-// P(k) in units of (Mpc)^3
-//====================================================
-
+/**
+ * @brief Matter power spectrum
+ * @param x log-scale factor
+ * @param k wavenumber
+ */
 double PowerSpectrum::get_matter_power_spectrum(const double x, const double k) const{
   double Hp      = cosmo->Hp_of_x(x);
   double Phi     = pert->get_Phi(x,k);
@@ -252,29 +256,56 @@ double PowerSpectrum::get_matter_power_spectrum(const double x, const double k) 
   return pofk;
 }
 
-//====================================================
-// Get methods
-//====================================================
+/**
+ * @brief Returns the interpolated TT (temperature-temperature) CMB power spectrum C_ell at the given multipole moment.
+ * @param ell Multipole moment ell.
+ * @return C_ell^TT evaluated at ell.
+ */
 double PowerSpectrum::get_cell_TT(const double ell) const{
   return cell_TT_spline(ell);
 }
+
+/**
+ * @brief Returns the interpolated TE (temperature-polarization) CMB power spectrum C_ell at the given multipole moment.
+ * @param ell Multipole moment ell.
+ * @return C_ell^TE evaluated at ell.
+ */
 double PowerSpectrum::get_cell_TE(const double ell) const{
   return cell_TE_spline(ell);
 }
+
+/**
+ * @brief Returns the interpolated EE (E-mode polarization) CMB power spectrum C_ell at the given multipole moment.
+ * @param ell Multipole moment ell.
+ * @return C_ell^EE evaluated at ell.
+ */
 double PowerSpectrum::get_cell_EE(const double ell) const{
   return cell_EE_spline(ell);
 }
+
+/**
+ * @brief Returns the splines of the temperature transfer function
+ *        Theta_ell(k) for each sampled ell.
+ * @return Vector of splines, one per ell, each mapping wavenumber k
+ *         to the temperature transfer function Theta_ell(k).
+ */
 std::vector<Spline> PowerSpectrum::get_thetaT_ell_of_k_spline() const{
   return thetaT_ell_of_k_spline;
 }
+
+/**
+ * @brief Returns the splines of the E-mode polarization transfer function Theta_ell^E(k) for each sampled ell.
+ * @return Vector of splines, one per ell, each mapping wavenumber k
+ *         to the E-mode polarization transfer function Theta_ell^E(k).
+ */
 std::vector<Spline> PowerSpectrum::get_thetaE_ell_of_k_spline() const{
   return thetaE_ell_of_k_spline;
 }
 
-//====================================================
-// Output the cells to file
-//====================================================
-
+/**
+ * @brief Output CMB power spectrum to file
+ * @param filename location of outfile
+ */
 void PowerSpectrum::output_CMB_spectrum(std::string filename) const{
   // Output in standard units of muK^2
   std::ofstream fp(filename.c_str());
@@ -297,6 +328,11 @@ void PowerSpectrum::output_CMB_spectrum(std::string filename) const{
   };
   std::for_each(ellvalues.begin(), ellvalues.end(), print_data);
 }
+
+/**
+ * @brief Output matter power spectrum to file with k in units [h/Mpc] and P(k) in units [(Mpc/h)^3]
+ * @param filename location of outfile
+ */
 void PowerSpectrum::output_matter_power_spectrum(std::string filename) const{
 
   std::ofstream fp(filename.c_str());
@@ -317,6 +353,11 @@ void PowerSpectrum::output_matter_power_spectrum(std::string filename) const{
   };
   std::for_each(k_array.begin(), k_array.end(), print_data);
 }
+/**
+ * @brief Output transfer functions to file
+ * @param filename location of outfile
+ * @param theta_spline spline of ThetaT_ell or ThetaE_ell transfer functions/multipoles
+ */
 void PowerSpectrum::output_transfer_func(std::string filename, std::vector<Spline> theta_spline) const{
 
   std::ofstream fp(filename.c_str());

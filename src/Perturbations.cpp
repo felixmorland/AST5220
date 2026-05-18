@@ -1,9 +1,5 @@
 #include"Perturbations.h"
 
-//====================================================
-// Constructors
-//====================================================
-
 Perturbations::Perturbations(
     BackgroundCosmology *cosmo, 
     RecombinationHistory *rec) : 
@@ -16,15 +12,17 @@ Perturbations::Perturbations(
   f_nu = Omega_nu0 / (Omega_gamma0 + Omega_nu0) * SimParams.neutrinos;
 }
 
-//====================================================
-// Do all the solving
-//====================================================
-
+/**
+ * @brief Solve the perturbation equations
+ */
 void Perturbations::solve(){
+
+  // Indicate new milestone
   std::cout << "\n\n";
   std::cout << "/==========================\\\n";
   std::cout << "|   III. PERTURBATIONS     |\n";
   std::cout << "\\==========================/\n\n";
+
   // Integrate all the perturbation equation and spline the result
   integrate_perturbations();
 
@@ -33,7 +31,9 @@ void Perturbations::solve(){
   compute_source_functions(true, true, true, true);
 }
 
-
+/**
+ * @brief Integrates the perturbation equations
+ */
 void Perturbations::integrate_perturbations(){
   Utils::StartTiming("integrateperturbation");
 
@@ -63,12 +63,6 @@ void Perturbations::integrate_perturbations(){
     auto end_tight     = get_tight_coupling_time(k, x_array);
     double x_end_tight = end_tight.first;
     int idx_end        = end_tight.second;
-
-    //===================================================================
-    // Tight coupling integration
-    // set_ic : The IC at the start
-    // rhs_tight_coupling_ode : The dydx for our coupled ODE system
-    //===================================================================
 
     // Set up initial conditions in the tight coupling regime
     auto y_tight_coupling_ini = set_ic(x_start, k);
@@ -156,11 +150,6 @@ void Perturbations::integrate_perturbations(){
       }
     }
 
-    //====================================================================
-    // Full equation integration
-    // set_ic_after_tight_coupling : The IC after tight coupling ends
-    // rhs_full_ode : The dydx for our coupled ODE system
-    //===================================================================
 
     // Set up initial conditions (y_tight_coupling is the solution at the end of tight coupling)
     auto y_full_ini = set_ic_after_tight_coupling(y_tight_coupling, x_end_tight, k);
@@ -237,18 +226,16 @@ void Perturbations::integrate_perturbations(){
   Pi_spline.create(x_array, k_array, Pi_array, "Pi_spline");
 }
 
-//====================================================
-// Set IC at the start of the run (this is in the
-// tight coupling regime)
-//====================================================
+/**
+ * @brief Sets the initial conditions going into TC regime
+ * @param x log-scale factor at the time of the initial condition
+ * @param k perturbation wavenumber
+ * @return Vector containing the initial values
+ */
 Vector Perturbations::set_ic(const double x, const double k) const{
 
   // The vector we are going to fill
   Vector y_tc(Constants.n_ell_tot_tc);
-
-  //=============================================================================
-  // Compute where in the y_tc array each component belongs
-  //=============================================================================
   
   // For integration of perturbations in tight coupling regime (Only 2 photon multipoles + neutrinos needed)
   const int n_ell_theta_tc      = Constants.n_ell_theta_tc;
@@ -300,7 +287,12 @@ Vector Perturbations::set_ic(const double x, const double k) const{
   return y_tc;
 }
 
-
+/**
+ * @brief Sets the initial conditions of the FULL system
+ * @param x log-scale factor at the time of the initial condition
+ * @param k perturbation wavenumber
+ * @return Vector containing the initial values
+ */
 Vector Perturbations::set_ic_after_tight_coupling(
     const Vector &y_tc, 
     const double x, 
@@ -389,10 +381,12 @@ Vector Perturbations::set_ic_after_tight_coupling(
   return y;
 }
 
-//====================================================
-// The time when tight coupling end
-//====================================================
-
+/**
+ * @brief Time for when to end the TC approximation
+ * @param k perturbation wavenumber
+ * @param x_array vector containing x values to check
+ * @return x and index at the end of TC regime
+ */
 std::pair<double,int> Perturbations::get_tight_coupling_time(const double k, Vector x_array) const{
   double x_tight_coupling_end = 0.0;
   int idx_end = 0;
@@ -410,10 +404,10 @@ std::pair<double,int> Perturbations::get_tight_coupling_time(const double k, Vec
   return std::pair<double,int>(x_tight_coupling_end, idx_end);
 }
 
-//====================================================
-// After integrsating the perturbation compute the
-// source function(s)
-//====================================================
+/**
+ * @brief LOS integral source functions S tilde and S_E
+ * @param SW_on, ISW_on, Dop_on, Pol_on bool turning on or off each term in the source function
+ */
 void Perturbations::compute_source_functions(
   bool SW_on,
   bool ISW_on,
@@ -500,12 +494,9 @@ void Perturbations::compute_source_functions(
   Utils::EndTiming("source");
 }
 
-//====================================================
-// The right hand side of the perturbations ODE
-// in the tight coupling regime
-//====================================================
-
-// Derivatives in the tight coupling regime
+/**
+ * @brief Right hand side of perurbation ODE in TC regime
+ */
 int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, double *dydx){
   
   // For integration of perturbations in tight coupling regime (Only 2 photon multipoles + neutrinos needed)
@@ -600,10 +591,9 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
   return GSL_SUCCESS;
 }
 
-//====================================================
-// The right hand side of the full ODE
-//====================================================
-
+/**
+ * @brief Right hand side of ODE for the FULL system
+ */
 int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dydx){
 
   // Index and number of the different quantities
@@ -728,60 +718,196 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
 // Get methods
 //====================================================
 
+/**
+ * @brief CDM density contrast
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return delta_cdm
+ */
 double Perturbations::get_delta_cdm(const double x, const double k) const{
   return delta_cdm_spline(x,k);
 }
+
+/**
+ * @brief Baryon density contrast
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return delta_b
+ */
 double Perturbations::get_delta_b(const double x, const double k) const{
   return delta_b_spline(x,k);
 }
+
+/**
+ * @brief CDM velocity divergence
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return v_cdm
+ */
 double Perturbations::get_v_cdm(const double x, const double k) const{
   return v_cdm_spline(x,k);
 }
+
+/**
+ * @brief Baryon velocity divergence
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return v_b
+ */
 double Perturbations::get_v_b(const double x, const double k) const{
   return v_b_spline(x,k);
 }
+
+/**
+ * @brief Derivative of baryon velocity divergence with respect to x
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return dv_b/dx
+ */
 double Perturbations::get_dv_bdx(const double x, const double k) const{
   return v_b_spline.deriv_x(x,k);
 }
+
+/**
+ * @brief Gravitational potential Phi
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return Phi
+ */
 double Perturbations::get_Phi(const double x, const double k) const{
   return Phi_spline(x,k);
 }
+
+/**
+ * @brief Derivative of gravitational potential Phi with respect to x
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return dPhi/dx
+ */
 double Perturbations::get_dPhidx(const double x, const double k) const{
   return Phi_spline.deriv_x(x,k);
 }
+
+/**
+ * @brief Gravitational potential Psi
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return Psi
+ */
 double Perturbations::get_Psi(const double x, const double k) const{
   return Psi_spline(x,k);
 }
+
+/**
+ * @brief Derivative of gravitational potential Psi with respect to x
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return dPsi/dx
+ */
 double Perturbations::get_dPsidx(const double x, const double k) const{
   return Psi_spline.deriv_x(x,k);
 }
+
+/**
+ * @brief Second derivative of gravitational potential Psi with respect to x
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return d^2Psi/dx^2
+ */
 double Perturbations::get_ddPsiddx(const double x, const double k) const{
   return Psi_spline.deriv_xx(x,k);
 }
+
+/**
+ * @brief Photon polarisation source term Pi
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return Pi
+ */
 double Perturbations::get_Pi(const double x, const double k) const{
   return Pi_spline(x,k);
 }
+
+/**
+ * @brief Derivative of Pi with respect to x
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return dPi/dx
+ */
 double Perturbations::get_dPidx(const double x, const double k) const{
   return Pi_spline.deriv_x(x,k);
 }
+
+/**
+ * @brief Second derivative of Pi with respect to x
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return d^2Pi/dx^2
+ */
 double Perturbations::get_ddPiddx(const double x, const double k) const{
   return Pi_spline.deriv_xx(x,k);
 }
+
+/**
+ * @brief Temperature CMB source function
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return S_T
+ */
 double Perturbations::get_Source_T(const double x, const double k) const{
   return ST_spline(x,k);
 }
+
+/**
+ * @brief Polarization CMB source function
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @return S_E
+ */
 double Perturbations::get_Source_E(const double x, const double k) const{
   return SE_spline(x,k);
 }
+
+/**
+ * @brief Photon temperature multipole moment of order ell
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @param ell the multipole order
+ * @return Theta_ell
+ */
 double Perturbations::get_Theta(const double x, const double k, const int ell) const{
   return Theta_spline[ell](x,k);
 }
+
+/**
+ * @brief Photon polarization multipole moment of order ell
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @param ell the multipole order
+ * @return ThetaP_ell
+ */
 double Perturbations::get_Theta_p(const double x, const double k, const int ell) const{
   return ThetaP_spline[ell](x,k);
 }
+
+/**
+ * @brief Massless neutrino multipole moment of order ell
+ * @param x the log-scale factor
+ * @param k the wavenumber
+ * @param ell the multipole order
+ * @return Nu_ell
+ */
 double Perturbations::get_Nu(const double x, const double k, const int ell) const{
   return Nu_spline[ell](x,k);
 }
+
+/**
+ * @brief Log-scale factor at which a mode with wavenumber k enters the horizon
+ * @details Scans x from x_start to x_end and returns the first x where kc/Hp >= 1.
+ *          Returns NaN if the mode never crosses the horizon within the integration range.
+ * @param k the wavenumber
+ * @return x at horizon entry, or NaN if not found
+ */
 double Perturbations::get_horizon_enter(const double k) const{
   int n_sample          = 1e6;
   Vector x_sample       = Utils::linspace(x_start, x_end, n_sample);
@@ -800,10 +926,9 @@ double Perturbations::get_horizon_enter(const double k) const{
   return std::numeric_limits<double>::quiet_NaN();
 }
 
-//====================================================
-// Print some useful info about the class
-//====================================================
-
+/**
+ * @brief Print info about Perturbation class
+ */
 void Perturbations::info() const{
   std::cout << "\n";
   std::cout << "Parameters...\n";
@@ -855,10 +980,11 @@ void Perturbations::info() const{
   std::cout << "n_ell_tot_tc:       " << Constants.n_ell_tot_tc         << "\n";
 }
 
-//====================================================
-// Output some results to file for a given value of k
-//====================================================
-
+/**
+ * @brief Output perturbation results to file
+ * @param k wavenumber of perturbation to export
+ * @param filename location of the outfile
+ */
 void Perturbations::pert_output(const double k, const std::string filename) const{
   std::ofstream fp(filename.c_str());
   const int npts = 5000;
@@ -887,6 +1013,11 @@ void Perturbations::pert_output(const double k, const std::string filename) cons
   std::for_each(x_array.begin(), x_array.end(), print_data);
 }
 
+/**
+ * @brief Output source function to file
+ * @param k wavenumber of source function to export
+ * @param filename location of the outfile
+ */
 void Perturbations::source_func_output(const double k, const std::string filename) const{
   std::ofstream fp(filename.c_str());
   const int npts = 5000;

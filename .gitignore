@@ -17,7 +17,6 @@ results/powerspectrum/*
 !results/powerspectrum/.gitkeep
 
 paper/*
-!paper/ast5220_paper.pdf
 
 cmb
 
