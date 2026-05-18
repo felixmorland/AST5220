@@ -1,8 +1,8 @@
 # Simulating cosmic perturbations and the CMB power spectrum from inflationary initial conditions in $\Lambda$ CDM
 ### A numerical project in Cosmology II, AST5220
-by Felix Morland
-
-MSc Astrophysics @ UiO, Spring 2026
+by Felix Morland \
+<sub>MSc Astrophysics @ UiO</sub>\
+<sup>Spring 2026</sup>
 
 ## Description
 This is a simple Einstein-Boltzmann solver that I developped as a project in the cosmology course AST5220 at the University of Oslo during the Spring semester 2026. It is based upon the [template made by Hans A. Winther](https://github.com/HAWinther/AST5220-Cosmology/), the guide made by [Petter Callin](https://arxiv.org/abs/astro-ph/0606683), as well as the lectures by [Winther](https://cmb.wintherscoming.no). 
@@ -25,9 +25,12 @@ $$H^2(a) \equiv \bigg(\frac{\dot{a}}{a}\bigg)^2 = \frac{8\pi G}{3}\sum_i \rho_i,
 $$\frac{\ddot{a}}{a} = -\frac{4\pi G}{3}\sum_i (\rho_i + 3p_i).$$
 
 Despite its simplifications, the solver is built on first principles with most of its governing equation accesible to master students. I have thus found the solver's merits to lie in the intuition it builds through first principles, while still producing results in impressive agreement with Planck 2018, SDSS, and Ly $\alpha$ observation (see figures below).
-
-<img src="figures/CMB_power_spectrum.pdf" width="300" height="200" alt="CMB power spectrum">
-<img src="figures/matter_power_spectrum.pdf" width="300" height="200" alt="Matter power spectrum">
+<p align="center">
+<img width="649" height="500" alt="CMB power spectrum" src="https://github.com/user-attachments/assets/7c7441d1-6a52-44b4-830b-d857e304c383" />
+</p>
+<p align="center">
+<img width="529" height="450" alt="Matter power spectrum" src="https://github.com/user-attachments/assets/d207a56e-81f2-44d8-b237-6eaea6cdb077" />
+</p>
 
 ## How to set up and run the simulation
 Other than the standard `C++` library, the code has *one* main dependency; the GSL scientific library. Make sure to have it installed and change the `Makefile` parameters specifying the location of your GSL library:
@@ -61,5 +64,4 @@ to compile, and can then run the simulation by executing
 ```
 ./cmb
 ```
-
 The results of the simulation should appear in the `results` directory. Some examples on how to plot and present the results are given in the Python-script available in the `python` directory.
